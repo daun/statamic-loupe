@@ -48,7 +48,7 @@
             ]
         },
         "statamic": {
-            "description": "Local-only SQLite search engine integration",
+            "description": "Local SQLite search engine integration",
             "name": "Loupe Search Driver"
         }
     }

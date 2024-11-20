@@ -1,0 +1,7 @@
+.antlers.json
+.DS_Store
+.env
+.idea
+.phpunit.result.cache
+.vscode
+vendor

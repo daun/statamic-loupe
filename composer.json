@@ -1,0 +1,55 @@
+{
+    "name": "daun/statamic-loupe",
+    "description": "Loupe search driver for Statamic",
+    "license": "MIT",
+    "type": "statamic-addon",
+    "keywords": [
+        "statamic",
+        "search",
+        "driver",
+        "loupe",
+        "sqlite"
+    ],
+    "authors": [
+        {
+            "name": "Philipp Daun",
+            "email": "post@philippdaun.net",
+            "homepage": "https://philippdaun.net"
+        }
+    ],
+    "support": {
+        "email": "post@philippdaun.net"
+    },
+    "require": {
+        "php": "^8.1",
+        "statamic/cms": "^4.0 || ^5.0",
+        "loupe/loupe": "0.7.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Daun\\StatamicLoupe\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Daun\\StatamicLoupe\\ServiceProvider"
+            ]
+        },
+        "statamic": {
+            "description": "Local-only SQLite search engine integration",
+            "name": "Loupe Search Driver"
+        }
+    }
+}

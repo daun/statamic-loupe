@@ -1,6 +1,7 @@
 # Statamic Loupe Search Driver
 
 **This addon provides a [Loupe](https://github.com/loupe-php/loupe) search driver for Statamic sites.**
+
 Loupe is a local SQLite search engine that is easy to set up and requires no additional infrastructure.
 
 ## Installation

@@ -19,9 +19,7 @@ class Manager
         protected readonly LoupeFactory $factory,
         protected string $path,
     ) {
-        if (! File::isDirectory($this->path)) {
-            File::makeDirectory($this->path, recursive: true);
-        }
+        File::ensureDirectoryExists($this->path, mode: 0777);
     }
 
     public function get(string $index, Configuration $configuration): Loupe
@@ -53,16 +51,14 @@ class Manager
 
     public function createIndex(string $index): void
     {
-        if (! File::isDirectory($dir = $this->indexDirectory($index))) {
-            File::makeDirectory($dir, recursive: true);
-        }
+        File::ensureDirectoryExists($this->indexDirectory($index), mode: 0777);
         if (! File::exists($db = $this->indexPath($index))) {
-            File::put($db, '');
+            File::put($db, '', lock: true);
         }
     }
 
     public function dropIndex(string $index): void
     {
-        File::deleteDirectory($this->indexDirectory($index));
+        File::cleanDirectory($this->indexDirectory($index));
     }
 }

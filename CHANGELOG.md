@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.2] - 2024-11-22
+
+- Do not pin loupe version
+
 ## [1.0.1] - 2024-11-21
 
 - Update readme

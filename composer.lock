@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7af58450a474fb2f2b94b168d115e4ff",
+    "content-hash": "bc82a98bdea24154bd044aa18f829604",
     "packages": [
         {
             "name": "ajthinking/archetype",
@@ -2420,16 +2420,16 @@
         },
         {
             "name": "loupe/loupe",
-            "version": "0.7.5",
+            "version": "0.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/loupe-php/loupe.git",
-                "reference": "83422c83126c8982b7d99de3014a84d98f8bcfee"
+                "reference": "f80a4531a46116b0a9c2889de49ad693224a0ad0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/loupe-php/loupe/zipball/83422c83126c8982b7d99de3014a84d98f8bcfee",
-                "reference": "83422c83126c8982b7d99de3014a84d98f8bcfee",
+                "url": "https://api.github.com/repos/loupe-php/loupe/zipball/f80a4531a46116b0a9c2889de49ad693224a0ad0",
+                "reference": "f80a4531a46116b0a9c2889de49ad693224a0ad0",
                 "shasum": ""
             },
             "require": {
@@ -2471,7 +2471,7 @@
             "description": "A full text search engine with tokenization, stemming, typo tolerance, filters and geo support based on only PHP and SQLite",
             "support": {
                 "issues": "https://github.com/loupe-php/loupe/issues",
-                "source": "https://github.com/loupe-php/loupe/tree/0.7.5"
+                "source": "https://github.com/loupe-php/loupe/tree/0.8.0"
             },
             "funding": [
                 {
@@ -2479,7 +2479,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-11-21T07:55:42+00:00"
+            "time": "2024-11-25T09:04:34+00:00"
         },
         {
             "name": "maennchen/zipstream-php",

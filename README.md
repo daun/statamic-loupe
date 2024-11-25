@@ -9,7 +9,7 @@ infrastructure.
 
 - Only requires PHP and SQLite, nothing else
 - Tolerates typos and supports stemming
-- Supports phrase search using `"quotation marks"`
+- Supports `-negated` queries and `"phrase search"`
 - Supports filtering and ordering on geo distance
 - Sorts by relevance
 

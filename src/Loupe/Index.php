@@ -25,6 +25,7 @@ class Index extends BaseIndex
         'typo_tolerance_alphabet_size' => 4,
         'typo_tolerance_index_length' => 14,
         'typo_tolerance_for_prefix_search' => false,
+        'ranking_score_threshold' => 0,
     ];
 
     public function __construct(
@@ -46,7 +47,10 @@ class Index extends BaseIndex
 
     public function lookup($query)
     {
-        $parameters = SearchParameters::create()->withQuery($query)->withHitsPerPage(999);
+        $parameters = SearchParameters::create()
+            ->withQuery($query)
+            ->withHitsPerPage(999)
+            ->withRankingScoreThreshold($this->config['ranking_score_threshold']);
         $result = $this->client->search($parameters);
 
         return collect($result->getHits())

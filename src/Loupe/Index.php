@@ -50,7 +50,9 @@ class Index extends BaseIndex
         $parameters = SearchParameters::create()
             ->withQuery($query)
             ->withHitsPerPage(999)
+            ->withShowRankingScore(true)
             ->withRankingScoreThreshold($this->config['ranking_score_threshold']);
+
         $result = $this->client->search($parameters);
 
         return collect($result->getHits())

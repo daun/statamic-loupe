@@ -26,9 +26,7 @@ Add the new driver to the `statamic/search.php` config file.
 
     // other drivers
 
-    'loupe' => [
-        'path' => storage_path('statamic/loupe'),
-    ],
+    'loupe' => [],
 ],
 ```
 

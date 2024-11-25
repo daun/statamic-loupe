@@ -82,6 +82,11 @@ class Index extends BaseIndex
 
     protected function insertDocuments(Documents $documents)
     {
+        // After upgrading Loupe, a reindex might be required
+        if ($this->client->needsReindex()) {
+            $this->resetIndex();
+        }
+
         $this->client->addDocuments($documents->all());
     }
 
@@ -105,8 +110,7 @@ class Index extends BaseIndex
 
     public function update()
     {
-        $this->deleteIndex();
-        $this->createIndex();
+        $this->resetIndex();
 
         $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
 
@@ -121,5 +125,11 @@ class Index extends BaseIndex
     protected function createIndex()
     {
         $this->manager->createIndex($this->name);
+    }
+
+    protected function resetIndex()
+    {
+        $this->deleteIndex();
+        $this->createIndex();
     }
 }

@@ -1,6 +1,11 @@
 # Changelog
 
-## [1.1.0] - 2024-11-22
+## [1.2.0] - 2024-11-26
+
+- Make ranking score threshold configurable
+- Add documentation for config flags
+
+## [1.1.0] - 2024-11-25
 
 - Upgrade loupe
 
@@ -16,6 +21,7 @@
 
 - Initial release 🎉
 
+[1.2.0]: https://github.com/daun/statamic-loupe/releases/tag/1.2.0
 [1.1.0]: https://github.com/daun/statamic-loupe/releases/tag/1.1.0
 [1.0.2]: https://github.com/daun/statamic-loupe/releases/tag/1.0.2
 [1.0.1]: https://github.com/daun/statamic-loupe/releases/tag/1.0.1

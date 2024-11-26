@@ -2,6 +2,7 @@
 
 namespace Daun\StatamicLoupe\Loupe;
 
+use Daun\StatamicLoupe\Search\Snippets;
 use Illuminate\Support\Arr;
 use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
@@ -29,7 +30,10 @@ class Index extends BaseIndex
         'ranking_score_threshold' => 0,
         'highlight_attributes' => [],
         'highlight_tags' => ['<mark>', '</mark>'],
+        'snippet_attributes' => [],
     ];
+
+    protected ?array $snippetAttributes = null;
 
     public function __construct(
         protected Manager $manager,
@@ -56,7 +60,7 @@ class Index extends BaseIndex
             ->withShowRankingScore(true)
             ->withRankingScoreThreshold($this->config['ranking_score_threshold'])
             ->withAttributesToHighlight(
-                $this->config['highlight_attributes'],
+                array_unique([...$this->config['highlight_attributes'], ...$this->config['snippet_attributes']]),
                 $this->config['highlight_tags'][0],
                 $this->config['highlight_tags'][1]
             );
@@ -157,7 +161,26 @@ class Index extends BaseIndex
 
         return [
             'search_score' => $raw['_rankingScore'] ?? null,
-            'search_highlights' => $raw['_formatted'] ?? null,
+            'search_highlights' => Arr::only($raw['_formatted'] ?? [], $this->config['highlight_attributes']),
+            'search_snippets' => $this->createSnippets($raw['_formatted'] ?? [], $this->config['snippet_attributes']),
         ];
+    }
+
+    protected function createSnippets(array $highlights, array $attributes): array
+    {
+        if (empty($attributes)) {
+            return [];
+        }
+
+        $this->snippetAttributes ??= collect($attributes)
+            ->filter(fn ($key, $value) => is_string($key) || is_string($value))
+            ->mapWithKeys(fn ($key, $value) => is_int($key) ? [$value => 10] : [$key => $value])
+            ->all();
+
+        [$start, $end] = $this->config['highlight_tags'];
+
+        return collect($this->snippetAttributes)
+            ->map(fn ($words, $attr) => (new Snippets($start, $end, $words))->generate($highlights[$attr]))
+            ->all();
     }
 }

@@ -72,7 +72,7 @@ class Index extends BaseIndex
             ->map(fn ($hit) => [
                 ...$hit,
                 'reference' => $hit['id'],
-                'search_score' => floor($hit['_rankingScore'] * 100)
+                'search_score' => floor($hit['_rankingScore'] * 100),
             ]);
     }
 
@@ -185,7 +185,7 @@ class Index extends BaseIndex
                 try {
                     return (new Snippets($start, $end, $words))->generate($highlights[$attr]);
                 } catch (\Exception $e) {
-                    return Str::limit($highlights[$attr], 200, true);
+                    return Str::limit($highlights[$attr], limit: 200, preserveWords: true);
                 }
             })
             ->all();

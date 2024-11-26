@@ -2,7 +2,8 @@
 
 namespace Daun\StatamicLoupe\Search;
 
-class Snippets {
+class Snippets
+{
     protected string $pattern;
 
     public function __construct(
@@ -15,7 +16,8 @@ class Snippets {
         $this->separator = sprintf(' %s ', trim($this->separator));
     }
 
-    public function generate(string $text): string {
+    public function generate(string $text): string
+    {
         $len = mb_strlen($text);
 
         if ($len === 0 || mb_strpos($text, $this->startTag) === false) {
@@ -36,11 +38,11 @@ class Snippets {
 
         $boundaries = $this->expandBoundaries($words, $boundaries);
 
-        $snippets = array_map(fn($b) => $this->buildSnippet($text, $b), $boundaries);
+        $snippets = array_map(fn ($b) => $this->buildSnippet($text, $b), $boundaries);
         $start = $boundaries[0][0];
         $end = $boundaries[count($boundaries) - 1][1];
         if ($start > 0) {
-            $snippets[0] = $this->separator . $snippets[0];
+            $snippets[0] = $this->separator.$snippets[0];
         }
         if ($end < $len) {
             $snippets[count($snippets) - 1] .= $this->separator;
@@ -49,17 +51,22 @@ class Snippets {
         return implode($this->separator, $snippets);
     }
 
-    private function getAllMarks(string $text): array {
+    private function getAllMarks(string $text): array
+    {
         preg_match_all($this->pattern, $text, $matches, PREG_OFFSET_CAPTURE);
+
         return $matches[0] ?? [];
     }
 
-    private function getAllWords(string $text): array {
+    private function getAllWords(string $text): array
+    {
         preg_match_all('/\S+/s', $text, $matches, PREG_OFFSET_CAPTURE);
-        return $matches[0] ?? [];
+
+        return $matches[0];
     }
 
-    private function getMatchBoundaries(array $words, int $matchPos, int $matchLength): array {
+    private function getMatchBoundaries(array $words, int $matchPos, int $matchLength): array
+    {
         $startPos = $matchPos;
         $endPos = $matchPos + $matchLength;
 
@@ -88,11 +95,12 @@ class Snippets {
             'word_start' => $matchStartIdx,
             'word_end' => $matchEndIdx,
             'text_start' => $words[$matchStartIdx][1],
-            'text_end' => $words[$matchEndIdx][1] + strlen($words[$matchEndIdx][0])
+            'text_end' => $words[$matchEndIdx][1] + strlen($words[$matchEndIdx][0]),
         ];
     }
 
-    private function expandBoundaries(array $words, array $boundaries): array {
+    private function expandBoundaries(array $words, array $boundaries): array
+    {
         if (empty($boundaries)) {
             return [];
         }
@@ -131,7 +139,7 @@ class Snippets {
                 // Add first match with its right context
                 $result[] = [
                     $current['text_start'],
-                    $leftWords[count($leftWords) - 1][1] + strlen($leftWords[count($leftWords) - 1][0])
+                    $leftWords[count($leftWords) - 1][1] + strlen($leftWords[count($leftWords) - 1][0]),
                 ];
 
                 // Start new current with left context of next match
@@ -139,7 +147,7 @@ class Snippets {
                     'text_start' => $rightWords[0][1],
                     'text_end' => $next['text_end'],
                     'word_start' => $next['word_start'],
-                    'word_end' => $next['word_end']
+                    'word_end' => $next['word_end'],
                 ];
             }
         }
@@ -150,20 +158,21 @@ class Snippets {
             $this->surroundingWords
         );
 
-        if (!empty($trailingWords)) {
+        if (! empty($trailingWords)) {
             $current['text_end'] = end($trailingWords)[1] + strlen(end($trailingWords)[0]);
         }
 
         // Add the last segment
         $result[] = [
             $current['text_start'],
-            $current['text_end']
+            $current['text_end'],
         ];
 
         return $result;
     }
 
-    private function buildSnippet(string $text, array $boundaries): string {
+    private function buildSnippet(string $text, array $boundaries): string
+    {
         // Extract the actual text portion from original text
         return substr($text, $boundaries[0], $boundaries[1] - $boundaries[0]);
     }

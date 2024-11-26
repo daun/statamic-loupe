@@ -4,6 +4,7 @@ namespace Daun\StatamicLoupe\Loupe;
 
 use Daun\StatamicLoupe\Search\Snippets;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\Loupe;
@@ -180,7 +181,13 @@ class Index extends BaseIndex
         [$start, $end] = $this->config['highlight_tags'];
 
         return collect($this->snippetAttributes)
-            ->map(fn ($words, $attr) => (new Snippets($start, $end, $words))->generate($highlights[$attr]))
+            ->map(function ($words, $attr) use ($highlights, $start, $end) {
+                try {
+                    return (new Snippets($start, $end, $words))->generate($highlights[$attr]);
+                } catch (\Exception $e) {
+                    return Str::limit($highlights[$attr], 200, true);
+                }
+            })
             ->all();
     }
 }

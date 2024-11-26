@@ -48,6 +48,11 @@ class Index extends BaseIndex
         $this->client = $this->manager->get($this->name, $this->configuration());
     }
 
+    public function client(): Loupe
+    {
+        return $this->client;
+    }
+
     public function search($query)
     {
         return (new Query($this))->query($query);

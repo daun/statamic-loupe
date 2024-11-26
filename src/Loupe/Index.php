@@ -173,8 +173,8 @@ class Index extends BaseIndex
         }
 
         $this->snippetAttributes ??= collect($attributes)
-            ->filter(fn ($key, $value) => is_string($key) || is_string($value))
-            ->mapWithKeys(fn ($key, $value) => is_int($key) ? [$value => 10] : [$key => $value])
+            ->filter(fn ($value, $key) => is_string($key) || is_string($value))
+            ->mapWithKeys(fn ($value, $key) => is_string($key) ? [$key => $value] : [$value => 10])
             ->all();
 
         [$start, $end] = $this->config['highlight_tags'];

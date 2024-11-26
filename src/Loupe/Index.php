@@ -64,7 +64,11 @@ class Index extends BaseIndex
         $result = $this->client->search($parameters);
 
         return collect($result->getHits())
-            ->map(fn ($hit) => [...$hit, 'reference' => $hit['id']]);
+            ->map(fn ($hit) => [
+                ...$hit,
+                'reference' => $hit['id'],
+                'search_score' => floor($hit['_rankingScore'] * 100)
+            ]);
     }
 
     protected function configuration(): Configuration
@@ -152,6 +156,7 @@ class Index extends BaseIndex
         $raw = $result->getRawResult();
 
         return [
+            'search_score' => $raw['_rankingScore'] ?? null,
             'search_highlights' => $raw['_formatted'] ?? null,
         ];
     }

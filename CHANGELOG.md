@@ -3,6 +3,7 @@
 ## [1.4.1] - 2024-11-26
 
 - Fix constructor signature
+- Document path config
 
 ## [1.4.0] - 2024-11-26
 

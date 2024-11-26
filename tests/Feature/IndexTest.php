@@ -6,7 +6,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Search;
 
 beforeEach(function () {
-    config(['statamic.search.drivers.loupe.path' => fixtures_path('indexes/' . random_int(11, 99999999))]);
+    config(['statamic.search.drivers.loupe.path' => fixtures_path('indexes/'.random_int(11, 99999999))]);
 });
 
 it('creates a Loupe client', function () {

@@ -9,7 +9,7 @@ class Snippets
     public function __construct(
         protected string $startTag = '<mark>',
         protected string $endTag = '</mark>',
-        protected int $surroundingWords = 4,
+        protected int $surroundingWords = 5,
         protected string $separator = '...'
     ) {
         $this->pattern = sprintf('/%s.*?%s/s', preg_quote($startTag, '/'), preg_quote($endTag, '/'));

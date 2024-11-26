@@ -130,7 +130,7 @@ You can also configure the exact tags to use for highlighting terms:
 Snippets are condensed highlights collecting only the actual matches and the text immediately
 surrounding them. This allows quick skimming of search results for relevancy and context.
 
-> <mark>Lorem ipsum</mark> dolor sit amet, consetetur ... no sea takimata sanctus est <mark>lorem</mark> est <mark>ipsum</mark> dolor sit amet. <mark>Lorem ipsum</mark> dolor sit amet, consetetur ... dolore te feugait nulla facilisi <mark>lorem ipsum</mark> dolor sit amet, consectetuer ...</p>
+> <mark>Lorem ipsum</mark> dolor sit amet, consetetur ... no sea takimata sanctus est <mark>lorem</mark> est <mark>ipsum</mark> dolor sit amet. <mark>Lorem ipsum</mark> dolor sit amet, consetetur ... dolore te feugait nulla facilisi <mark>lorem ipsum</mark> dolor sit amet, consectetuer ...
 
 To enable snippets, define the attributes you want to generate them for, as well
 as the number of words to include around each match.

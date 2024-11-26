@@ -15,10 +15,13 @@ class Manager
      */
     protected array $clients = [];
 
+    protected LoupeFactory $factory;
+
     public function __construct(
-        protected readonly LoupeFactory $factory,
-        protected string $path,
+        protected string $path
     ) {
+        $this->factory = new LoupeFactory();
+
         File::ensureDirectoryExists($this->path, mode: 0777);
     }
 

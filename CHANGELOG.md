@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.0] - 2024-11-26
+
+- Provide condensed search snippets
+
 ## [1.3.0] - 2024-11-26
 
 - Provide search highlights
@@ -25,6 +29,7 @@
 
 - Initial release 🎉
 
+[1.4.0]: https://github.com/daun/statamic-loupe/releases/tag/1.4.0
 [1.3.0]: https://github.com/daun/statamic-loupe/releases/tag/1.3.0
 [1.2.0]: https://github.com/daun/statamic-loupe/releases/tag/1.2.0
 [1.1.0]: https://github.com/daun/statamic-loupe/releases/tag/1.1.0

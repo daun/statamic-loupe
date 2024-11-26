@@ -83,6 +83,43 @@ configuration items](https://github.com/loupe-php/loupe/blob/main/docs/configura
 ],
 ```
 
+## Search highlights
+
+Enable term highlighting to wrap occurrences of search words in `<mark>` tags. You'll need to
+explicitly define the attributes to apply highlighting in.
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'all',
++       'highlight_attributes' => ['title', 'summary'],
+    ],
+],
+```
+
+You can now display the configured fields from the `search_highlights` namespace:
+
+```antlers
+{{ search:results }}
+  <h2>{{ search_highlights:title }}</h2>
+  <p>{{ search_highlights:summary }}</p>
+{{ /search:results }}
+```
+
+You can also configure the exact tags to use for highlighting terms:
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'all',
+        'highlight_attributes' => ['title', 'summary'],
++       'highlight_tags' => ['<span class="highlight">', '</span>'],
+    ],
+],
+```
+
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)

@@ -1,5 +1,3 @@
-use Daun\StatamicLoupe\Search\Snippets;
-
 <?php
 
 use Daun\StatamicLoupe\Search\Snippets;

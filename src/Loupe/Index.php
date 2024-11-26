@@ -10,6 +10,7 @@ use Loupe\Loupe\SearchParameters;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
+use Statamic\Search\Result;
 
 class Index extends BaseIndex
 {
@@ -26,6 +27,8 @@ class Index extends BaseIndex
         'typo_tolerance_index_length' => 14,
         'typo_tolerance_for_prefix_search' => false,
         'ranking_score_threshold' => 0,
+        'highlight_attributes' => [],
+        'highlight_tags' => ['<mark>', '</mark>'],
     ];
 
     public function __construct(
@@ -51,7 +54,12 @@ class Index extends BaseIndex
             ->withQuery($query)
             ->withHitsPerPage(999)
             ->withShowRankingScore(true)
-            ->withRankingScoreThreshold($this->config['ranking_score_threshold']);
+            ->withRankingScoreThreshold($this->config['ranking_score_threshold'])
+            ->withAttributesToHighlight(
+                $this->config['highlight_attributes'],
+                $this->config['highlight_tags'][0],
+                $this->config['highlight_tags'][1]
+            );
 
         $result = $this->client->search($parameters);
 
@@ -137,5 +145,14 @@ class Index extends BaseIndex
     {
         $this->deleteIndex();
         $this->createIndex();
+    }
+
+    public function extraAugmentedResultData(Result $result)
+    {
+        $raw = $result->getRawResult();
+
+        return [
+            'search_highlights' => $raw['_formatted'] ?? null,
+        ];
     }
 }

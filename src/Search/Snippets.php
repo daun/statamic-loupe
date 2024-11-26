@@ -35,10 +35,10 @@ class Snippets
         $snippets = array_map(fn ($b) => $this->buildSnippet($text, $b), $boundaries);
 
         if (!empty($boundaries) && $boundaries[0][0] > 0) {
-            $snippets[0] = $this->separator . $snippets[0];
+            $snippets[0] = ltrim($this->separator) . $snippets[0];
         }
         if (!empty($boundaries) && end($boundaries)[1] < $len) {
-            $snippets[count($snippets) - 1] .= $this->separator;
+            $snippets[count($snippets) - 1] .= rtrim($this->separator);
         }
 
         return implode($this->separator, $snippets);

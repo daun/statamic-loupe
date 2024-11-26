@@ -34,10 +34,10 @@ class Snippets
 
         $snippets = array_map(fn ($b) => $this->buildSnippet($text, $b), $boundaries);
 
-        if (!empty($boundaries) && $boundaries[0][0] > 0) {
-            $snippets[0] = ltrim($this->separator) . $snippets[0];
+        if (! empty($boundaries) && $boundaries[0][0] > 0) {
+            $snippets[0] = ltrim($this->separator).$snippets[0];
         }
-        if (!empty($boundaries) && end($boundaries)[1] < $len) {
+        if (! empty($boundaries) && end($boundaries)[1] < $len) {
             $snippets[count($snippets) - 1] .= rtrim($this->separator);
         }
 
@@ -47,12 +47,14 @@ class Snippets
     private function getAllMarks(string $text): array
     {
         preg_match_all($this->pattern, $text, $matches, PREG_OFFSET_CAPTURE);
+
         return $matches[0] ?? [];
     }
 
     private function getAllWords(string $text): array
     {
         preg_match_all('/\S+/s', $text, $matches, PREG_OFFSET_CAPTURE);
+
         return $matches[0];
     }
 
@@ -105,6 +107,7 @@ class Snippets
                     // Merge with previous segment
                     $currentSegment['end'] = $segmentEnd;
                     $currentSegment['lastWordIdx'] = $matchEndIdx;
+
                     continue;
                 }
 
@@ -116,7 +119,7 @@ class Snippets
             $currentSegment = [
                 'start' => $segmentStart,
                 'end' => $segmentEnd,
-                'lastWordIdx' => $matchEndIdx
+                'lastWordIdx' => $matchEndIdx,
             ];
         }
 

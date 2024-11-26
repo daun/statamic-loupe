@@ -4,7 +4,7 @@
 
 ## Loupe
 
-Loupe is a local SQLite search engine that is easy to set up and requires no additional
+...is a local SQLite search engine that is easy to set up and requires no additional
 infrastructure.
 
 - Only requires PHP and SQLite, nothing else
@@ -12,6 +12,11 @@ infrastructure.
 - Supports `-negated` queries and `"phrase search"`
 - Supports filtering and ordering on geo distance
 - Sorts by relevance
+
+## This addon
+
+- Manages search indexes behind the scene
+- Provides highlights and snippets for contextual search results
 
 ## Installation
 

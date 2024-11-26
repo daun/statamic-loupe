@@ -120,6 +120,31 @@ You can also configure the exact tags to use for highlighting terms:
 ],
 ```
 
+## Search snippets
+
+Snippets are condensed highlights collecting only the actual matches and the text immediately
+surrounding them. To enable snippets, define the attributes you want to generate them for, as well
+as the number of words to include around each match.
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'all',
++       'snippet_attributes' => ['title' => 5, 'summary' => 10],
+    ],
+],
+```
+
+Then use the `search_snippets` namespace to display the formatted fields:
+
+```antlers
+{{ search:results }}
+  <h2>{{ search_snippets:title }}</h2>
+  <p>{{ search_snippets:summary }}</p>
+{{ /search:results }}
+```
+
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)

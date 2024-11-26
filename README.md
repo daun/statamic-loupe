@@ -15,7 +15,7 @@ infrastructure.
 
 ## This addon
 
-- Manages search indexes behind the scene
+- Manages search indexes behind the scenes
 - Provides highlights and snippets for contextual search results
 
 ## Installation

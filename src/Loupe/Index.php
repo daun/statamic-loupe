@@ -100,7 +100,7 @@ class Index extends BaseIndex
 
     public function delete($document)
     {
-        $this->client->deleteDocument($document->id());
+        $this->client->deleteDocument($document->getSearchReference());
     }
 
     public function exists()

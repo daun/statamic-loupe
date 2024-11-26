@@ -4,7 +4,7 @@
 
 ## Loupe
 
-Loupe is a local SQLite search engine that is easy to set up and requires no additional
+...is a local SQLite search engine that is easy to set up and requires no additional
 infrastructure.
 
 - Only requires PHP and SQLite, nothing else
@@ -12,6 +12,11 @@ infrastructure.
 - Supports `-negated` queries and `"phrase search"`
 - Supports filtering and ordering on geo distance
 - Sorts by relevance
+
+## This addon
+
+- Manages search indexes behind the scenes
+- Provides highlights and snippets for contextual search results
 
 ## Installation
 
@@ -118,6 +123,35 @@ You can also configure the exact tags to use for highlighting terms:
 +       'highlight_tags' => ['<span class="highlight">', '</span>'],
     ],
 ],
+```
+
+## Search snippets
+
+Snippets are condensed highlights collecting only the actual matches and the text immediately
+surrounding them. This allows quick skimming of search results for relevancy and context.
+
+> <mark>Lorem ipsum</mark> dolor sit amet, consetetur ... no sea takimata sanctus est <mark>lorem</mark> est <mark>ipsum</mark> dolor sit amet. <mark>Lorem ipsum</mark> dolor sit amet, consetetur ... dolore te feugait nulla facilisi <mark>lorem ipsum</mark> dolor sit amet, consectetuer ...
+
+To enable snippets, define the attributes you want to generate them for, as well
+as the number of words to include around each match.
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'all',
++       'snippet_attributes' => ['title' => 5, 'summary' => 10],
+    ],
+],
+```
+
+Then use the `search_snippets` namespace to display the formatted fields:
+
+```antlers
+{{ search:results }}
+  <h2>{{ search_snippets:title }}</h2>
+  <p>{{ search_snippets:summary }}</p>
+{{ /search:results }}
 ```
 
 ## License

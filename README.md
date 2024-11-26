@@ -55,6 +55,9 @@ configuration items](https://github.com/loupe-php/loupe/blob/main/docs/configura
 ```php
 'drivers' => [
     'loupe' => [
+        // Storage directory of Loupe's index database
+        'path' => storage_path('statamic/loupe'),
+
         // Number of documents to process at once during indexing
         // Helps to limit memory consumption at the cost of indexing speed
         'chunk' => 100,

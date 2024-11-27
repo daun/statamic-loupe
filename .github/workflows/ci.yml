@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [ '8.2', '8.3' ]
-        laravel: [ '9', '10', '11' ]
+        php: [ '8.1', '8.2', '8.3' ]
+        laravel: [ '10', '11' ]
         exclude:
           - php: '8.1'
             laravel: '11'
@@ -32,14 +32,6 @@ jobs:
 
       - name: Setup Problem Matchers
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
-      - name: Select Laravel 9
-        uses: nick-invision/retry@v3
-        if: ${{ matrix.laravel == '9' }}
-        with:
-          timeout_minutes: 3
-          max_attempts: 3
-          command: composer require "laravel/framework:9.*" "orchestra/testbench:^7.40" "pestphp/pest:^1.22" "pestphp/pest-plugin-laravel:^1.4" "spatie/pest-plugin-snapshots:^1.1" --no-update --no-interaction
 
       - name: Select Laravel 10
         uses: nick-invision/retry@v3

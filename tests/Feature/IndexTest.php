@@ -37,8 +37,6 @@ it('adds documents to the index', function () {
         ->data(['title' => 'Entry 2']);
     $entry2->save();
 
-    sleep(1); // give it some time to process
-
     $this->assertCount(2, $index->lookup('Entry'));
 });
 
@@ -62,16 +60,12 @@ it('updates documents in the index', function () {
         ->data(['title' => 'Entry 2']);
     $entry2->save();
 
-    sleep(1); // give it some time to process
-
     $results = collect($index->lookup('Entry'))->pluck('title');
 
     $this->assertContains('Entry 1', $results);
     $this->assertContains('Entry 2', $results);
 
     $entry2->merge(['title' => 'Entry 2 Updated'])->save();
-
-    sleep(1); // give it some time to process
 
     $results = collect($index->lookup('Entry'))->pluck('title');
 
@@ -98,16 +92,12 @@ it('removes documents from the index', function () {
         ->data(['title' => 'Entry 2']);
     $entry2->save();
 
-    sleep(1); // give it some time to process
-
     $results = collect($index->lookup('Entry'))->pluck('title');
 
     $this->assertContains('Entry 1', $results);
     $this->assertContains('Entry 2', $results);
 
     $entry2->delete();
-
-    sleep(1); // give it some time to process
 
     $results = collect($index->lookup('Entry'))->pluck('title');
 

@@ -48,6 +48,11 @@ class Index extends BaseIndex
         $this->client = $this->manager->get($this->name, $this->configuration());
     }
 
+    public function client(): Loupe
+    {
+        return $this->client;
+    }
+
     public function search($query)
     {
         return (new Query($this))->query($query);
@@ -72,7 +77,7 @@ class Index extends BaseIndex
             ->map(fn ($hit) => [
                 ...$hit,
                 'reference' => $hit['id'],
-                'search_score' => floor($hit['_rankingScore'] * 100)
+                'search_score' => floor($hit['_rankingScore'] * 100),
             ]);
     }
 
@@ -95,7 +100,7 @@ class Index extends BaseIndex
 
     public function delete($document)
     {
-        $this->client->deleteDocument($document->id());
+        $this->client->deleteDocument($document->getSearchReference());
     }
 
     public function exists()
@@ -185,7 +190,7 @@ class Index extends BaseIndex
                 try {
                     return (new Snippets($start, $end, $words))->generate($highlights[$attr]);
                 } catch (\Exception $e) {
-                    return Str::limit($highlights[$attr], 200, true);
+                    return Str::limit($highlights[$attr], limit: 200, preserveWords: true);
                 }
             })
             ->all();

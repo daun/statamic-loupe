@@ -20,14 +20,14 @@ class Manager
     public function __construct(
         protected string $path
     ) {
-        $this->factory = new LoupeFactory();
+        $this->factory = new LoupeFactory;
 
         File::ensureDirectoryExists($this->path, mode: 0777);
     }
 
     public function get(string $index, Configuration $configuration): Loupe
     {
-        return ($this->clients[$index] ??= $this->make($index, $configuration));
+        return $this->clients[$index] ??= $this->make($index, $configuration);
     }
 
     public function make(string $index, Configuration $configuration): Loupe

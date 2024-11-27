@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.2] - 2024-11-27
+
+- Use correct document id when deleting
+- Expand snippets to 5 surrounding words
+- Add test coverage
+
 ## [1.4.1] - 2024-11-26
 
 - Fix constructor signature
@@ -34,6 +40,7 @@
 
 - Initial release 🎉
 
+[1.4.2]: https://github.com/daun/statamic-loupe/releases/tag/1.4.2
 [1.4.1]: https://github.com/daun/statamic-loupe/releases/tag/1.4.1
 [1.4.0]: https://github.com/daun/statamic-loupe/releases/tag/1.4.0
 [1.3.0]: https://github.com/daun/statamic-loupe/releases/tag/1.3.0

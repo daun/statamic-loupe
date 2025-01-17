@@ -19,6 +19,12 @@ it('builds the correct paths and directories', function () {
     expect($index->path())->toEqual($this->basePath.'/loupe_index/loupe.db');
 });
 
+it('creates a Loupe client', function () {
+    $index = Search::index('loupe_index');
+
+    expect($index->client())->toBeInstanceOf(Loupe::class);
+});
+
 it('only creates an index if required', function () {
     $index = Search::index('loupe_index');
     expect($index->exists())->toBeFalse();
@@ -26,12 +32,6 @@ it('only creates an index if required', function () {
     $client = $index->client();
 
     expect($index->exists())->toBeTrue();
-});
-
-it('creates a Loupe client', function () {
-    $index = Search::index('loupe_index');
-
-    expect($index->client())->toBeInstanceOf(Loupe::class);
 });
 
 it('adds documents to the index', function () {

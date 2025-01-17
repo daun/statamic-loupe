@@ -25,6 +25,14 @@
         "statamic/cms": "^4.0 || ^5.0",
         "loupe/loupe": "^0.8.0"
     },
+    "require-dev": {
+        "larastan/larastan": "^2.9",
+        "laravel/pint": "^1.14",
+        "mockery/mockery": "^1.6",
+        "orchestra/testbench": "^9.5",
+        "pestphp/pest": "^3.3",
+        "pestphp/pest-plugin-laravel": "^3.0"
+    },
     "autoload": {
         "psr-4": {
             "Daun\\StatamicLoupe\\": "src"
@@ -39,7 +47,10 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "pixelfear/composer-dist-plugin": true
-        }
+        },
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
     },
     "extra": {
         "laravel": {
@@ -51,5 +62,14 @@
             "description": "Local SQLite search engine integration",
             "name": "Loupe Search Driver"
         }
+    },
+    "scripts": {
+        "analyse": "./vendor/bin/phpstan analyse --memory-limit=2G",
+        "format": "./vendor/bin/pint",
+        "lint": "./vendor/bin/pint --test",
+        "test": "./vendor/bin/pest",
+        "test:ci": "./vendor/bin/pest",
+        "test:ci:coverate": "./vendor/bin/pest --coverage-clover coverage.xml",
+        "test:coverage": "./vendor/bin/pest --coverage"
     }
 }

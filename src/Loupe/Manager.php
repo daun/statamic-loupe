@@ -26,6 +26,7 @@ class Manager
     ) {
         $this->factory = new LoupeFactory();
         $this->filesystem = new Filesystem();
+
         $this->init();
     }
 
@@ -36,6 +37,7 @@ class Manager
         if (! $this->filesystem->isDirectory($this->path)) {
             throw new Exception(sprintf('The Loupe path "%s" does not exist and cannot be created.', $this->path));
         }
+
         if (! $this->filesystem->isWritable($this->path)) {
             throw new Exception(sprintf('The Loupe path "%s" is not writable.', $this->path));
         }

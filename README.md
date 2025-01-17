@@ -1,5 +1,10 @@
 # Statamic Loupe Search Driver
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/daun/statamic-loupe.svg)](https://packagist.org/packages/daun/statamic-loupe)
+[![Test Status](https://img.shields.io/github/actions/workflow/status/daun/statamic-loupe/ci.yml?label=tests)](https://github.com/daun/statamic-loupe/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/daun/statamic-loupe.svg)](https://github.com/daun/statamic-loupe/blob/master/LICENSE)
+<!-- [![Code Coverage](https://img.shields.io/codecov/c/github/daun/statamic-loupe)](https://app.codecov.io/gh/daun/statamic-loupe) -->
+
 **This addon provides a [Loupe](https://github.com/loupe-php/loupe) search driver for Statamic sites.**
 
 ## Loupe
@@ -55,6 +60,9 @@ configuration items](https://github.com/loupe-php/loupe/blob/main/docs/configura
 ```php
 'drivers' => [
     'loupe' => [
+        // Storage directory of Loupe's index database
+        'path' => storage_path('statamic/loupe'),
+
         // Number of documents to process at once during indexing
         // Helps to limit memory consumption at the cost of indexing speed
         'chunk' => 100,

@@ -23,7 +23,7 @@
     "require": {
         "php": "^8.1",
         "statamic/cms": "^4.0 || ^5.0",
-        "loupe/loupe": "^0.8.0"
+        "loupe/loupe": "^0.9.0"
     },
     "require-dev": {
         "larastan/larastan": "^2.9",
@@ -68,8 +68,7 @@
         "format": "./vendor/bin/pint",
         "lint": "./vendor/bin/pint --test",
         "test": "./vendor/bin/pest",
-        "test:ci": "./vendor/bin/pest",
-        "test:ci:coverate": "./vendor/bin/pest --coverage-clover coverage.xml",
+        "test:ci": "./vendor/bin/pest --coverage-clover coverage.xml",
         "test:coverage": "./vendor/bin/pest --coverage"
     }
 }

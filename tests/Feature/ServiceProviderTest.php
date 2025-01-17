@@ -9,8 +9,8 @@ it('boots without issues', function () {
     $provider->bootAddon();
 })->throwsNoExceptions();
 
-it('register a search driver', function () {
-    $index = Search::index('loupe_index');
+it('registers a search driver', function () {
+    $index = Search::index('pages');
 
     expect($index)->toBeInstanceOf(Index::class);
 });

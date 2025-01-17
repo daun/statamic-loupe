@@ -1,5 +1,6 @@
 <?php
 
+use Daun\StatamicLoupe\Loupe\Factory;
 use Daun\StatamicLoupe\Loupe\Index;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\LoupeFactory;
@@ -58,4 +59,22 @@ it('overrides defaults', function () {
     $configuration = $index->configuration();
 
     expect($configuration->getTypoTolerance()->isDisabled())->toEqual(true);
+});
+
+it('passes the configuration into the factory', function () {
+    $spy = Mockery::spy(Factory::class);
+    $spy->shouldReceive('create')
+        ->andReturn((new Factory(new LoupeFactory))->create(fixtures_path('indexes/default'), Configuration::create()));
+
+    $this->app->instance(Factory::class, $spy);
+
+    $index = $this->app->makeWith(Index::class, ['name' => 'default']);
+    $configuration = $index->configuration();
+
+    $client = $index->client();
+
+    $spy->shouldHaveReceived('create')
+        ->once()
+        ->with($index->dir(), $configuration);
+
 });

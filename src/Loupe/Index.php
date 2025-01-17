@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\Loupe;
-use Loupe\Loupe\LoupeFactory;
 use Loupe\Loupe\SearchParameters;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Documents;
@@ -20,6 +19,8 @@ use Statamic\Search\Result;
 class Index extends BaseIndex
 {
     protected ?Loupe $client = null;
+
+    protected ?Configuration $configuration = null;
 
     protected array $defaults = [
         'fields' => ['title'],
@@ -40,7 +41,7 @@ class Index extends BaseIndex
     protected ?array $snippetAttributes = null;
 
     public function __construct(
-        protected LoupeFactory $factory,
+        protected Factory $factory,
         protected Filesystem $filesystem,
         string $name,
         array $config = [],
@@ -105,7 +106,7 @@ class Index extends BaseIndex
 
     public function configuration(): Configuration
     {
-        return Configuration::create()
+        return $this->configuration ??= Configuration::create()
             ->withPrimaryKey('id')
             ->withSearchableAttributes(
                 collect($this->config['fields'])->keyBy(fn ($f) => $f)->except(['id'])->values()->all()

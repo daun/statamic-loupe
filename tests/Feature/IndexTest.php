@@ -6,7 +6,26 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Search;
 
 beforeEach(function () {
-    config(['statamic.search.drivers.loupe.path' => fixtures_path('indexes/'.random_int(11, 99999999))]);
+    $this->basePath = fixtures_path('indexes/'.random_int(11, 99999999));
+
+    config(['statamic.search.drivers.loupe.path' => $this->basePath]);
+});
+
+it('builds the correct paths and directories', function () {
+    $index = Search::index('loupe_index');
+
+    expect($index->base())->toEqual($this->basePath . '/');
+    expect($index->dir())->toEqual($this->basePath . '/loupe_index');
+    expect($index->path())->toEqual($this->basePath . '/loupe_index/loupe.db');
+});
+
+it('only creates an index if required', function () {
+    $index = Search::index('loupe_index');
+    expect($index->exists())->toBeFalse();
+
+    $client = $index->client();
+
+    expect($index->exists())->toBeTrue();
 });
 
 it('creates a Loupe client', function () {

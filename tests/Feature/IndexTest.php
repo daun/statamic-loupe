@@ -14,9 +14,9 @@ beforeEach(function () {
 it('builds the correct paths and directories', function () {
     $index = Search::index('loupe_index');
 
-    expect($index->base())->toEqual($this->basePath . '/');
-    expect($index->dir())->toEqual($this->basePath . '/loupe_index');
-    expect($index->path())->toEqual($this->basePath . '/loupe_index/loupe.db');
+    expect($index->base())->toEqual($this->basePath.'/');
+    expect($index->dir())->toEqual($this->basePath.'/loupe_index');
+    expect($index->path())->toEqual($this->basePath.'/loupe_index/loupe.db');
 });
 
 it('only creates an index if required', function () {

@@ -138,7 +138,7 @@ class Index extends BaseIndex
 
     public function update()
     {
-        $this->resetIndex();
+        $this->truncateIndex();
 
         $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
 
@@ -147,7 +147,7 @@ class Index extends BaseIndex
 
     protected function deleteIndex()
     {
-        $this->manager->dropIndex($this->name);
+        $this->manager->deleteIndex($this->name);
     }
 
     protected function createIndex()
@@ -155,9 +155,9 @@ class Index extends BaseIndex
         $this->manager->createIndex($this->name);
     }
 
-    protected function resetIndex()
+    protected function truncateIndex()
     {
-        $this->manager->clearIndex($this->name);
+        $this->manager->truncateIndex($this->name);
     }
 
     public function extraAugmentedResultData(Result $result)

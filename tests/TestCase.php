@@ -49,8 +49,15 @@ abstract class TestCase extends OrchestraTestCase
         // Assume pro edition for our tests
         $app['config']->set('statamic.editions.pro', true);
 
-        // Add search index using Loupe
-        $app['config']->set('statamic.search.indexes.loupe_index', [
+        // Define folder for temporary index files
+        $app['config']->set('statamic.search.drivers.loupe.path', fixtures_path('indexes'));
+
+        // Add search indexes using Loupe
+        $app['config']->set('statamic.search.indexes.default', [
+            'driver' => 'loupe',
+            'searchables' => ['all'],
+        ]);
+        $app['config']->set('statamic.search.indexes.pages', [
             'driver' => 'loupe',
             'searchables' => ['collection:pages'],
         ]);

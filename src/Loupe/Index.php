@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\Loupe;
-use Loupe\Loupe\LoupeFactory;
 use Loupe\Loupe\SearchParameters;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Documents;
@@ -20,6 +19,8 @@ use Statamic\Search\Result;
 class Index extends BaseIndex
 {
     protected ?Loupe $client = null;
+
+    protected ?Configuration $configuration = null;
 
     protected array $defaults = [
         'fields' => ['title'],
@@ -40,27 +41,27 @@ class Index extends BaseIndex
     protected ?array $snippetAttributes = null;
 
     public function __construct(
-        protected LoupeFactory $factory,
+        protected Factory $factory,
         protected Filesystem $filesystem,
         string $name,
-        array $config,
+        array $config = [],
         ?string $locale = null
     ) {
         $config = [...$this->defaults, ...$config];
         parent::__construct($name, $config, $locale);
     }
 
-    protected function base(): string
+    public function base(): string
     {
         return Str::finish($this->config['path'] ?? storage_path('statamic/loupe'), '/');
     }
 
-    protected function dir(): string
+    public function dir(): string
     {
         return $this->base().$this->name;
     }
 
-    protected function path(): string
+    public function path(): string
     {
         return $this->base().$this->name.'/loupe.db';
     }
@@ -103,11 +104,13 @@ class Index extends BaseIndex
             ]);
     }
 
-    protected function configuration(): Configuration
+    public function configuration(): Configuration
     {
-        return Configuration::create()
+        return $this->configuration ??= Configuration::create()
             ->withPrimaryKey('id')
-            ->withSearchableAttributes(Arr::except($this->config['fields'], ['id']))
+            ->withSearchableAttributes(
+                collect($this->config['fields'])->keyBy(fn ($f) => $f)->except(['id'])->values()->all()
+            )
             ->withMaxQueryTokens($this->config['max_query_tokens'])
             ->withMinTokenLengthForPrefixSearch($this->config['min_token_length_for_prefix_search'])
             ->withLanguages($this->config['stemming_languages'])

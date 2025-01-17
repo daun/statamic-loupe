@@ -157,8 +157,7 @@ class Index extends BaseIndex
 
     protected function resetIndex()
     {
-        $this->deleteIndex();
-        $this->createIndex();
+        $this->manager->clearIndex($this->name);
     }
 
     public function extraAugmentedResultData(Result $result)

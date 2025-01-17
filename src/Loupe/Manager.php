@@ -81,8 +81,12 @@ class Manager
 
     public function dropIndex(string $index): void
     {
+        $this->filesystem->cleanDirectory($this->indexDirectory($index));
+    }
+
+    public function clearIndex(string $index): void
+    {
         $this->get($index, Configuration::create())->deleteAllDocuments();
-        // $this->filesystem->cleanDirectory($this->indexDirectory($index));
     }
 
     public function indexDirectory(string $index): string

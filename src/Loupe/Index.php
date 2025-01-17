@@ -3,11 +3,14 @@
 namespace Daun\StatamicLoupe\Loupe;
 
 use Daun\StatamicLoupe\Search\Snippets;
+use Exception;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\Loupe;
+use Loupe\Loupe\LoupeFactory;
 use Loupe\Loupe\SearchParameters;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Documents;
@@ -16,7 +19,7 @@ use Statamic\Search\Result;
 
 class Index extends BaseIndex
 {
-    protected Loupe $client;
+    protected ?Loupe $client = null;
 
     protected array $defaults = [
         'fields' => ['title'],
@@ -37,19 +40,38 @@ class Index extends BaseIndex
     protected ?array $snippetAttributes = null;
 
     public function __construct(
-        protected Manager $manager,
+        protected LoupeFactory $factory,
+        protected Filesystem $filesystem,
         string $name,
         array $config,
         ?string $locale = null
     ) {
         $config = [...$this->defaults, ...$config];
         parent::__construct($name, $config, $locale);
+    }
 
-        $this->client = $this->manager->get($this->name, $this->configuration());
+    protected function base(): string
+    {
+        return Str::finish($this->config['path'] ?? storage_path('statamic/loupe'), '/');
+    }
+
+    protected function dir(): string
+    {
+        return $this->base().$this->name;
+    }
+
+    protected function path(): string
+    {
+        return $this->base().$this->name.'/loupe.db';
     }
 
     public function client(): Loupe
     {
+        if (! $this->client) {
+            $this->createIndex();
+            $this->client = $this->factory->create($this->dir(), $this->configuration());
+        }
+
         return $this->client;
     }
 
@@ -71,7 +93,7 @@ class Index extends BaseIndex
                 $this->config['highlight_tags'][1]
             );
 
-        $result = $this->client->search($parameters);
+        $result = $this->client()->search($parameters);
 
         return collect($result->getHits())
             ->map(fn ($hit) => [
@@ -100,22 +122,22 @@ class Index extends BaseIndex
 
     public function delete($document)
     {
-        $this->client->deleteDocument($document->getSearchReference());
+        $this->client()->deleteDocument($document->getSearchReference());
     }
 
     public function exists()
     {
-        return $this->manager->indexExists($this->name);
+        return $this->filesystem->exists($this->path());
     }
 
     protected function insertDocuments(Documents $documents)
     {
         // After upgrading Loupe, a reindex might be required
-        if ($this->client->needsReindex()) {
-            $this->resetIndex();
+        if ($this->client()->needsReindex()) {
+            $this->truncateIndex();
         }
 
-        $this->client->addDocuments($documents->all());
+        $this->client()->addDocuments($documents->all());
     }
 
     public function insertMultiple($documents)
@@ -138,7 +160,7 @@ class Index extends BaseIndex
 
     public function update()
     {
-        $this->resetIndex();
+        $this->truncateIndex();
 
         $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
 
@@ -147,18 +169,31 @@ class Index extends BaseIndex
 
     protected function deleteIndex()
     {
-        $this->manager->dropIndex($this->name);
+        $this->filesystem->cleanDirectory($this->path());
     }
 
     protected function createIndex()
     {
-        $this->manager->createIndex($this->name);
+        $dir = $this->dir();
+        $db = $this->path();
+
+        if (! $this->filesystem->exists($db)) {
+            $this->filesystem->ensureDirectoryExists($dir);
+            $this->filesystem->put($db, '');
+        }
+
+        if (! $this->filesystem->isFile($db)) {
+            throw new Exception(sprintf('The Loupe index "%s" does not exist and cannot be created.', $db));
+        }
+
+        if (! $this->filesystem->isWritable($db)) {
+            throw new Exception(sprintf('The Loupe index "%s" is not writable.', $db));
+        }
     }
 
-    protected function resetIndex()
+    protected function truncateIndex()
     {
-        $this->deleteIndex();
-        $this->createIndex();
+        $this->client()->deleteAllDocuments();
     }
 
     public function extraAugmentedResultData(Result $result)
@@ -167,13 +202,19 @@ class Index extends BaseIndex
 
         return [
             'search_score' => $raw['_rankingScore'] ?? null,
-            'search_highlights' => Arr::only($raw['_formatted'] ?? [], $this->config['highlight_attributes']),
-            'search_snippets' => $this->createSnippets($raw['_formatted'] ?? [], $this->config['snippet_attributes']),
+            'search_highlights' => $this->getHighlights($raw['_formatted'] ?? []),
+            'search_snippets' => $this->getSnippets($raw['_formatted'] ?? []),
         ];
     }
 
-    protected function createSnippets(array $highlights, array $attributes): array
+    protected function getHighlights(array $fields): array
     {
+        return Arr::only($fields, $this->config['highlight_attributes'] ?? []);
+    }
+
+    protected function getSnippets(array $fields): array
+    {
+        $attributes = $this->config['snippet_attributes'] ?? [];
         if (empty($attributes)) {
             return [];
         }
@@ -186,11 +227,11 @@ class Index extends BaseIndex
         [$start, $end] = $this->config['highlight_tags'];
 
         return collect($this->snippetAttributes)
-            ->map(function ($words, $attr) use ($highlights, $start, $end) {
+            ->map(function ($words, $attr) use ($fields, $start, $end) {
                 try {
-                    return (new Snippets($start, $end, $words))->generate($highlights[$attr]);
+                    return (new Snippets($start, $end, $words))->generate($fields[$attr]);
                 } catch (\Exception $e) {
-                    return Str::limit($highlights[$attr], limit: 200, preserveWords: true);
+                    return Str::limit($fields[$attr], limit: 200, preserveWords: true);
                 }
             })
             ->all();

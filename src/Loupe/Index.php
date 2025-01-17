@@ -43,7 +43,7 @@ class Index extends BaseIndex
         protected LoupeFactory $factory,
         protected Filesystem $filesystem,
         string $name,
-        array $config,
+        array $config = [],
         ?string $locale = null
     ) {
         $config = [...$this->defaults, ...$config];
@@ -103,11 +103,11 @@ class Index extends BaseIndex
             ]);
     }
 
-    protected function configuration(): Configuration
+    public function configuration(): Configuration
     {
         return Configuration::create()
             ->withPrimaryKey('id')
-            ->withSearchableAttributes(Arr::except($this->config['fields'], ['id']))
+            ->withSearchableAttributes(collect($this->config['fields'])->keyBy(null)->except(['id'])->values()->all())
             ->withMaxQueryTokens($this->config['max_query_tokens'])
             ->withMinTokenLengthForPrefixSearch($this->config['min_token_length_for_prefix_search'])
             ->withLanguages($this->config['stemming_languages'])

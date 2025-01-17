@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.5.0] - 2025-01-17
+
+- Upgrade loupe to 0.9
+- More efficient index handling
+- Expand test coverage
+
 ## [1.4.2] - 2024-11-27
 
 - Use correct document id when deleting
@@ -40,6 +46,7 @@
 
 - Initial release 🎉
 
+[1.5.0]: https://github.com/daun/statamic-loupe/releases/tag/1.5.0
 [1.4.2]: https://github.com/daun/statamic-loupe/releases/tag/1.4.2
 [1.4.1]: https://github.com/daun/statamic-loupe/releases/tag/1.4.1
 [1.4.0]: https://github.com/daun/statamic-loupe/releases/tag/1.4.0

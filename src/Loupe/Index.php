@@ -57,12 +57,12 @@ class Index extends BaseIndex
 
     protected function dir(): string
     {
-        return $this->base() . $this->name;
+        return $this->base().$this->name;
     }
 
     protected function path(): string
     {
-        return $this->base() . $this->name . '/loupe.db';
+        return $this->base().$this->name.'/loupe.db';
     }
 
     public function client(): Loupe

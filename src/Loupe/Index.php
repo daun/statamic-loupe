@@ -107,7 +107,9 @@ class Index extends BaseIndex
     {
         return Configuration::create()
             ->withPrimaryKey('id')
-            ->withSearchableAttributes(collect($this->config['fields'])->keyBy(null)->except(['id'])->values()->all())
+            ->withSearchableAttributes(
+                collect($this->config['fields'])->keyBy(fn ($f) => $f)->except(['id'])->values()->all()
+            )
             ->withMaxQueryTokens($this->config['max_query_tokens'])
             ->withMinTokenLengthForPrefixSearch($this->config['min_token_length_for_prefix_search'])
             ->withLanguages($this->config['stemming_languages'])

@@ -50,17 +50,17 @@ class Index extends BaseIndex
         parent::__construct($name, $config, $locale);
     }
 
-    protected function base(): string
+    public function base(): string
     {
         return Str::finish($this->config['path'] ?? storage_path('statamic/loupe'), '/');
     }
 
-    protected function dir(): string
+    public function dir(): string
     {
         return $this->base().$this->name;
     }
 
-    protected function path(): string
+    public function path(): string
     {
         return $this->base().$this->name.'/loupe.db';
     }

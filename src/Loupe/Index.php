@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\Loupe;
+use Loupe\Loupe\LoupeFactoryInterface as LoupeFactory;
 use Loupe\Loupe\SearchParameters;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Documents;
@@ -41,7 +42,7 @@ class Index extends BaseIndex
     protected ?array $snippetAttributes = null;
 
     public function __construct(
-        protected Factory $factory,
+        protected LoupeFactory $factory,
         protected Filesystem $filesystem,
         string $name,
         array $config = [],

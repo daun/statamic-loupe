@@ -5,9 +5,14 @@ use Daun\StatamicLoupe\ServiceProvider;
 use Statamic\Facades\Search;
 
 it('boots without issues', function () {
-    $provider = new ServiceProvider($this->app);
-    $provider->bootAddon();
-})->throwsNoExceptions();
+    try {
+        $provider = new ServiceProvider($this->app);
+        $provider->bootAddon();
+        expect(true)->toBeTrue();
+    } catch (\Throwable $th) {
+        $this->fail();
+    }
+});
 
 it('registers a search driver', function () {
     $index = Search::index('pages');

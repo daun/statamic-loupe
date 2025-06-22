@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.7.0] - 2025-06-22
+
+- Upgrade loupe to 0.12
+
 ## [1.6.0] - 2025-03-06
 
 - Add support for Laravel 12
@@ -50,6 +54,7 @@
 
 - Initial release 🎉
 
+[1.7.0]: https://github.com/daun/statamic-loupe/releases/tag/1.7.0
 [1.6.0]: https://github.com/daun/statamic-loupe/releases/tag/1.6.0
 [1.5.0]: https://github.com/daun/statamic-loupe/releases/tag/1.5.0
 [1.4.2]: https://github.com/daun/statamic-loupe/releases/tag/1.4.2

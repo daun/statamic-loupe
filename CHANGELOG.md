@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.0.0] - 2025-10
+
+- Add support for Statamic 6
+- Remove support for Statamic 4 and 5
+
 ## [1.7.0] - 2025-06-22
 
 - Upgrade loupe to 0.12
@@ -54,6 +59,7 @@
 
 - Initial release 🎉
 
+[2.0.0]: https://github.com/daun/statamic-loupe/releases/tag/2.0.0
 [1.7.0]: https://github.com/daun/statamic-loupe/releases/tag/1.7.0
 [1.6.0]: https://github.com/daun/statamic-loupe/releases/tag/1.6.0
 [1.5.0]: https://github.com/daun/statamic-loupe/releases/tag/1.5.0

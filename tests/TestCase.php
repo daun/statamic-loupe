@@ -4,7 +4,7 @@ namespace Tests;
 
 use Daun\StatamicLoupe\ServiceProvider as AddonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
-use Statamic\Extend\Manifest;
+use Statamic\Addons\Manifest;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use Tests\Concerns\PreventSavingStacheItemsToDisk;
@@ -72,10 +72,24 @@ abstract class TestCase extends OrchestraTestCase
 
     protected function registerStatamicAddon($app)
     {
+        $reflector = new \ReflectionClass(AddonServiceProvider::class);
+        $directory = dirname($reflector->getFileName());
+
+        $providerParts = explode('\\', AddonServiceProvider::class, -1);
+        $namespace = implode('\\', $providerParts);
+
+        $json = json_decode($app['files']->get($directory.'/../composer.json'), true);
+        $statamic = $json['extra']['statamic'] ?? [];
+        $autoload = $json['autoload']['psr-4'][$namespace.'\\'];
+
         $app->make(Manifest::class)->manifest = [
-            'daun/statamic-loupe' => [
-                'id' => 'daun/statamic-loupe',
-                'namespace' => 'Daun\\StatamicLoupe',
+            $json['name'] => [
+                'id' => $json['name'],
+                'slug' => $statamic['slug'] ?? null,
+                'version' => 'dev-main',
+                'namespace' => $namespace,
+                'autoload' => $autoload,
+                'provider' => AddonServiceProvider::class,
             ],
         ];
     }

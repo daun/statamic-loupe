@@ -45,7 +45,7 @@ Now set your indexes to use the new driver.
     'default' => [
 -       'driver' => 'local',
 +       'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
     ],
 ],
 ```
@@ -105,7 +105,7 @@ explicitly define the attributes to apply highlighting in.
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
 +       'highlight_attributes' => ['title', 'summary'],
     ],
 ],
@@ -126,7 +126,7 @@ You can also configure the exact tags to use for highlighting terms:
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
         'highlight_attributes' => ['title', 'summary'],
 +       'highlight_tags' => ['<span class="highlight">', '</span>'],
     ],
@@ -147,7 +147,7 @@ as the number of words to include around each match.
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
 +       'snippet_attributes' => ['title' => 5, 'summary' => 10],
     ],
 ],

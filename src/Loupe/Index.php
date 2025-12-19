@@ -11,7 +11,6 @@ use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\Loupe;
 use Loupe\Loupe\SearchParameters;
-use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\Result;
@@ -139,7 +138,11 @@ class Index extends BaseIndex
             $this->truncateIndex();
         }
 
-        $this->client()->addDocuments($documents->all());
+        $documentsWithIds = $documents
+            ->map(fn (array $doc, string $reference) => [...$doc, 'id' => $reference])
+            ->values();
+
+        $this->client()->addDocuments($documentsWithIds->all());
     }
 
     public function update()

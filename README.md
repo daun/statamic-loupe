@@ -23,6 +23,10 @@ infrastructure.
 - Manages search indexes behind the scenes
 - Provides highlights and snippets for contextual search results
 
+## Requirements
+
+- SQLite PDO 3.35 or higher
+
 ## Installation
 
 ```sh

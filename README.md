@@ -1,16 +1,12 @@
 # Statamic Loupe Search Driver
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/daun/statamic-loupe.svg)](https://packagist.org/packages/daun/statamic-loupe)
-[![Test Status](https://img.shields.io/github/actions/workflow/status/daun/statamic-loupe/ci.yml?label=tests)](https://github.com/daun/statamic-loupe/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/daun/statamic-loupe.svg)](https://github.com/daun/statamic-loupe/blob/master/LICENSE)
-<!-- [![Code Coverage](https://img.shields.io/codecov/c/github/daun/statamic-loupe)](https://app.codecov.io/gh/daun/statamic-loupe) -->
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/daun/statamic-loupe.svg)](https://packagist.org/packages/daun/statamic-loupe) [![Test Status](https://img.shields.io/github/actions/workflow/status/daun/statamic-loupe/ci.yml?label=tests)](https://github.com/daun/statamic-loupe/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/daun/statamic-loupe.svg)](https://github.com/daun/statamic-loupe/blob/master/LICENSE) <!-- [![Code Coverage](https://img.shields.io/codecov/c/github/daun/statamic-loupe)](https://app.codecov.io/gh/daun/statamic-loupe) -->
 
 **This addon provides a [Loupe](https://github.com/loupe-php/loupe) search driver for Statamic sites.**
 
 ## Loupe
 
-...is a local SQLite search engine that is easy to set up and requires no additional
-infrastructure.
+...is a local SQLite search engine that is easy to set up and requires no additional infrastructure.
 
 - Only requires PHP and SQLite, nothing else
 - Tolerates typos and supports stemming
@@ -22,6 +18,10 @@ infrastructure.
 
 - Manages search indexes behind the scenes
 - Provides highlights and snippets for contextual search results
+
+## Requirements
+
+- SQLite PDO 3.35 or higher
 
 ## Installation
 
@@ -45,7 +45,7 @@ Now set your indexes to use the new driver.
     'default' => [
 -       'driver' => 'local',
 +       'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
     ],
 ],
 ```
@@ -62,10 +62,6 @@ configuration items](https://github.com/loupe-php/loupe/blob/main/docs/configura
     'loupe' => [
         // Storage directory of Loupe's index database
         'path' => storage_path('statamic/loupe'),
-
-        // Number of documents to process at once during indexing
-        // Helps to limit memory consumption at the cost of indexing speed
-        'chunk' => 100,
 
         // Maximum number of words allowed in a search
         // Higher values allow more complex queries but may impact performance
@@ -105,7 +101,7 @@ explicitly define the attributes to apply highlighting in.
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
 +       'highlight_attributes' => ['title', 'summary'],
     ],
 ],
@@ -126,7 +122,7 @@ You can also configure the exact tags to use for highlighting terms:
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
         'highlight_attributes' => ['title', 'summary'],
 +       'highlight_tags' => ['<span class="highlight">', '</span>'],
     ],
@@ -147,7 +143,7 @@ as the number of words to include around each match.
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
 +       'snippet_attributes' => ['title' => 5, 'summary' => 10],
     ],
 ],

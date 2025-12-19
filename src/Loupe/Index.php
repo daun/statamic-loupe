@@ -24,7 +24,6 @@ class Index extends BaseIndex
 
     protected array $defaults = [
         'fields' => ['title'],
-        'chunk' => 100,
         'max_query_tokens' => 10,
         'min_token_length_for_prefix_search' => 2,
         'stemming_languages' => [],
@@ -133,7 +132,7 @@ class Index extends BaseIndex
         return $this->filesystem->exists($this->path());
     }
 
-    protected function insertDocuments(Documents $documents)
+    public function insertDocuments(Documents $documents)
     {
         // After upgrading Loupe, a reindex might be required
         if ($this->client()->needsReindex()) {
@@ -141,24 +140,6 @@ class Index extends BaseIndex
         }
 
         $this->client()->addDocuments($documents->all());
-    }
-
-    public function insertMultiple($documents)
-    {
-        (new Documents($documents))
-            ->chunk($this->config['chunk'] ?? 100)
-            ->each(function ($documents) {
-                $documents = (new Documents($documents))
-                    ->map(fn (Searchable $item) => [
-                        ...$this->searchables()->fields($item),
-                        'id' => $item->getSearchReference(),
-                    ])
-                    ->values();
-
-                $this->insertDocuments($documents);
-            });
-
-        return $this;
     }
 
     public function update()

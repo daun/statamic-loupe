@@ -62,9 +62,13 @@ it('overrides defaults', function () {
 });
 
 it('passes the configuration into the factory', function () {
+    if (! file_exists(fixtures_path('indexes', 'default'))) {
+        mkdir(fixtures_path('indexes', 'default'), recursive: true);
+    }
+
     $spy = Mockery::spy(Factory::class);
     $spy->shouldReceive('create')
-        ->andReturn((new Factory(new LoupeFactory))->create(fixtures_path('indexes/default'), Configuration::create()));
+        ->andReturn((new Factory(new LoupeFactory))->create(fixtures_path('indexes', 'default'), Configuration::create()));
 
     $this->app->instance(Factory::class, $spy);
 

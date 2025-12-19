@@ -18,7 +18,7 @@ jobs:
         include:
           - laravel: 12.*
             testbench: 10.*
-            pest: 3.*
+            pest: 4.*
     name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }} / Statamic ${{ matrix.statamic }}
     steps:
       - name: Checkout code

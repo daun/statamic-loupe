@@ -23,8 +23,8 @@
     "require": {
         "php": "^8.1",
         "laravel/framework": "^9.0 || ^10.0 || ^11.0 || ^12.0",
-        "statamic/cms": "^4.0 || ^5.0",
-        "loupe/loupe": "^0.13"
+        "loupe/loupe": "dev-feature/decomposition",
+        "statamic/cms": "^4.0 || ^5.0"
     },
     "require-dev": {
         "larastan/larastan": "^2.9 || ^3.0",
@@ -34,6 +34,8 @@
         "pestphp/pest": "^1.0 || ^2.0 || ^3.0",
         "pestphp/pest-plugin-laravel": "^3.0"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Daun\\StatamicLoupe\\": "src"

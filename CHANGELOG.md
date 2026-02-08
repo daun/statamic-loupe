@@ -3,7 +3,7 @@
 ## [3.0.0] - 2026-02-08
 
 - Add support for Statamic 6
-- Remove support for Statamic 4 and 5
+- Drop support for Statamic 4 and 5
 
 ## [2.0.0] - 2025-12-19
 

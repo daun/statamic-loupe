@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.0.0] - 2026-01
+## [3.0.0] - 2026-02-08
 
 - Add support for Statamic 6
 - Remove support for Statamic 4 and 5

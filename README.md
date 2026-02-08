@@ -45,7 +45,7 @@ Now set your indexes to use the new driver.
     'default' => [
 -       'driver' => 'local',
 +       'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
     ],
 ],
 ```
@@ -62,10 +62,6 @@ configuration items](https://github.com/loupe-php/loupe/blob/main/docs/configura
     'loupe' => [
         // Storage directory of Loupe's index database
         'path' => storage_path('statamic/loupe'),
-
-        // Number of documents to process at once during indexing
-        // Helps to limit memory consumption at the cost of indexing speed
-        'chunk' => 100,
 
         // Maximum number of words allowed in a search
         // Higher values allow more complex queries but may impact performance
@@ -105,7 +101,7 @@ explicitly define the attributes to apply highlighting in.
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
 +       'highlight_attributes' => ['title', 'summary'],
     ],
 ],
@@ -126,7 +122,7 @@ You can also configure the exact tags to use for highlighting terms:
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
         'highlight_attributes' => ['title', 'summary'],
 +       'highlight_tags' => ['<span class="highlight">', '</span>'],
     ],
@@ -147,7 +143,7 @@ as the number of words to include around each match.
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
-        'searchables' => 'all',
+        'searchables' => 'content',
 +       'snippet_attributes' => ['title' => 5, 'summary' => 10],
     ],
 ],

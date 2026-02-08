@@ -11,7 +11,6 @@ use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\Loupe;
 use Loupe\Loupe\SearchParameters;
-use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\Result;
@@ -24,7 +23,6 @@ class Index extends BaseIndex
 
     protected array $defaults = [
         'fields' => ['title'],
-        'chunk' => 100,
         'max_query_tokens' => 10,
         'min_token_length_for_prefix_search' => 2,
         'stemming_languages' => [],
@@ -133,32 +131,18 @@ class Index extends BaseIndex
         return $this->filesystem->exists($this->path());
     }
 
-    protected function insertDocuments(Documents $documents)
+    public function insertDocuments(Documents $documents)
     {
         // After upgrading Loupe, a reindex might be required
         if ($this->client()->needsReindex()) {
             $this->truncateIndex();
         }
 
-        $this->client()->addDocuments($documents->all());
-    }
+        $documentsWithIds = $documents
+            ->map(fn (array $doc, string $reference) => [...$doc, 'id' => $reference])
+            ->values();
 
-    public function insertMultiple($documents)
-    {
-        (new Documents($documents))
-            ->chunk($this->config['chunk'] ?? 100)
-            ->each(function ($documents) {
-                $documents = (new Documents($documents))
-                    ->map(fn (Searchable $item) => [
-                        ...$this->searchables()->fields($item),
-                        'id' => $item->getSearchReference(),
-                    ])
-                    ->values();
-
-                $this->insertDocuments($documents);
-            });
-
-        return $this;
+        $this->client()->addDocuments($documentsWithIds->all());
     }
 
     public function update()

@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.1.0] - 2026-03-24
+
+- Add support for Laravel 13
+
 ## [3.0.0] - 2026-02-08
 
 - Add support for Statamic 6
@@ -65,6 +69,7 @@
 
 - Initial release 🎉
 
+[3.1.0]: https://github.com/daun/statamic-loupe/releases/tag/3.1.0
 [3.0.0]: https://github.com/daun/statamic-loupe/releases/tag/3.0.0
 [2.0.0]: https://github.com/daun/statamic-loupe/releases/tag/2.0.0
 [1.7.0]: https://github.com/daun/statamic-loupe/releases/tag/1.7.0

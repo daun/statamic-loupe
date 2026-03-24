@@ -9,7 +9,7 @@ it('boots without issues', function () {
         $provider = new ServiceProvider($this->app);
         $provider->bootAddon();
         expect(true)->toBeTrue();
-    } catch (\Throwable $th) {
+    } catch (Throwable $th) {
         $this->fail();
     }
 });

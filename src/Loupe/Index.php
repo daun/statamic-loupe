@@ -217,7 +217,7 @@ class Index extends BaseIndex
             ->map(function ($words, $attr) use ($fields, $start, $end) {
                 try {
                     return (new Snippets($start, $end, $words))->generate($fields[$attr]);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     return Str::limit($fields[$attr], limit: 200, preserveWords: true);
                 }
             })

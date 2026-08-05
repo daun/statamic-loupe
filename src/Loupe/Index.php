@@ -10,6 +10,7 @@ use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\Loupe;
 use Loupe\Loupe\SearchParameters;
+use Statamic\Facades\Site;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\Result;
@@ -20,16 +21,23 @@ class Index extends BaseIndex
 
     protected ?Configuration $configuration = null;
 
+    /**
+     * Empty values defer to Loupe's own defaults instead of freezing them here.
+     */
     protected array $defaults = [
         'fields' => ['title'],
-        'max_query_tokens' => 10,
+        'languages' => 'auto',
+        'max_query_tokens' => null,
+        'max_total_hits' => null,
         'min_token_length_for_prefix_search' => 2,
-        'stemming_languages' => [],
+        'ranking_rules' => [],
+        'stop_words' => [],
         'typo_tolerance_enabled' => true,
-        'typo_tolerance_alphabet_size' => 4,
-        'typo_tolerance_index_length' => 14,
-        'typo_tolerance_for_prefix_search' => false,
+        'typo_tolerance_alphabet_size' => null,
+        'typo_tolerance_index_length' => null,
+        'typo_tolerance_for_prefix_search' => null,
         'ranking_score_threshold' => 0,
+        'hits_per_page' => null,
         'highlight_attributes' => [],
         'highlight_tags' => ['<mark>', '</mark>'],
         'snippet_attributes' => [],
@@ -85,7 +93,7 @@ class Index extends BaseIndex
     {
         $parameters = SearchParameters::create()
             ->withQuery($query)
-            ->withHitsPerPage(999)
+            ->withHitsPerPage($this->hitsPerPage())
             ->withShowRankingScore(true)
             ->withRankingScoreThreshold($this->config['ranking_score_threshold'])
             ->withAttributesToHighlight(
@@ -112,21 +120,82 @@ class Index extends BaseIndex
 
     public function configuration(): Configuration
     {
-        return $this->configuration ??= Configuration::create()
+        if ($this->configuration) {
+            return $this->configuration;
+        }
+
+        $configuration = Configuration::create()
             ->withPrimaryKey('id')
             ->withSearchableAttributes(
                 collect($this->config['fields'])->keyBy(fn ($f) => $f)->except(['id'])->values()->all()
             )
-            ->withMaxQueryTokens($this->config['max_query_tokens'])
-            ->withMinTokenLengthForPrefixSearch($this->config['min_token_length_for_prefix_search'])
-            ->withLanguages($this->config['stemming_languages'])
-            ->withTypoTolerance(
-                $this->config['typo_tolerance_enabled']
-                    ? TypoTolerance::create()
-                        ->withAlphabetSize($this->config['typo_tolerance_alphabet_size'])
-                        ->withIndexLength($this->config['typo_tolerance_index_length'])
-                    : TypoTolerance::disabled()
-            );
+            ->withLanguages($this->languages())
+            ->withTypoTolerance($this->typoTolerance());
+
+        $options = [
+            'max_query_tokens' => 'withMaxQueryTokens',
+            'max_total_hits' => 'withMaxTotalHits',
+            'min_token_length_for_prefix_search' => 'withMinTokenLengthForPrefixSearch',
+            'ranking_rules' => 'withRankingRules',
+            'stop_words' => 'withStopWords',
+        ];
+
+        foreach ($options as $key => $method) {
+            if (filled($this->config[$key] ?? null)) {
+                $configuration = $configuration->{$method}($this->config[$key]);
+            }
+        }
+
+        return $this->configuration = $configuration;
+    }
+
+    protected function typoTolerance(): TypoTolerance
+    {
+        if (! ($this->config['typo_tolerance_enabled'] ?? true)) {
+            return TypoTolerance::disabled();
+        }
+
+        $tolerance = TypoTolerance::create();
+
+        $options = [
+            'typo_tolerance_alphabet_size' => 'withAlphabetSize',
+            'typo_tolerance_index_length' => 'withIndexLength',
+            'typo_tolerance_for_prefix_search' => 'withEnabledForPrefixSearch',
+        ];
+
+        foreach ($options as $key => $method) {
+            if (! is_null($this->config[$key] ?? null)) {
+                $tolerance = $tolerance->{$method}($this->config[$key]);
+            }
+        }
+
+        return $tolerance;
+    }
+
+    public function hitsPerPage(): int
+    {
+        $max = min($this->config['max_total_hits'] ?? SearchParameters::MAX_LIMIT, SearchParameters::MAX_LIMIT);
+
+        return min($this->config['hits_per_page'] ?? $max, $max);
+    }
+
+    public function languages(): array
+    {
+        $languages = $this->config['languages'] ?? 'auto';
+
+        if (is_array($languages)) {
+            return array_values(array_unique($languages));
+        }
+
+        if ($languages !== 'auto') {
+            return [];
+        }
+
+        $sites = $this->locale()
+            ? collect([Site::get($this->locale())])->filter()
+            : Site::all();
+
+        return $sites->map->lang()->filter()->unique()->values()->all();
     }
 
     public function delete($document)

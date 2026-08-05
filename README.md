@@ -137,14 +137,20 @@ surrounding them. This allows quick skimming of search results for relevancy and
 > <mark>Lorem ipsum</mark> dolor sit amet, consetetur ... no sea takimata sanctus est <mark>lorem</mark> est <mark>ipsum</mark> dolor sit amet. <mark>Lorem ipsum</mark> dolor sit amet, consetetur ... dolore te feugait nulla facilisi <mark>lorem ipsum</mark> dolor sit amet, consectetuer ...
 
 To enable snippets, define the attributes you want to generate them for, as well
-as the number of words to include around each match.
+as the maximum length in characters of each snippet fragment. Matches inside snippets are
+highlighted automatically, so there is no need to also list the attribute in
+`highlight_attributes`.
 
 ```diff
 'indexes' => [
     'default' => [
         'driver' => 'loupe',
         'searchables' => 'content',
-+       'snippet_attributes' => ['title' => 5, 'summary' => 10],
+        'highlight_attributes' => ['title'],
++       'snippet_attributes' => ['summary' => 150],
+    ],
+],
+```
     ],
 ],
 ```
@@ -158,6 +164,20 @@ Then use the `search_snippets` namespace to display the formatted fields:
 {{ /search:results }}
 ```
 
+A snippet is assembled from up to `snippet_max_fragments` fragments, joined and delimited
+by `snippet_marker`:
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'content',
+        'snippet_attributes' => ['summary' => 150],
++       'snippet_max_fragments' => 5,
++       'snippet_marker' => '…',
+    ],
+],
+```
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)

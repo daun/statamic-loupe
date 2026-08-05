@@ -2,7 +2,6 @@
 
 namespace Daun\StatamicLoupe\Loupe;
 
-use Daun\StatamicLoupe\Search\Snippets;
 use Exception;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
@@ -34,6 +33,9 @@ class Index extends BaseIndex
         'highlight_attributes' => [],
         'highlight_tags' => ['<mark>', '</mark>'],
         'snippet_attributes' => [],
+        'snippet_length' => 50,
+        'snippet_marker' => '…',
+        'snippet_max_fragments' => 5,
     ];
 
     protected ?array $snippetAttributes = null;
@@ -87,9 +89,15 @@ class Index extends BaseIndex
             ->withShowRankingScore(true)
             ->withRankingScoreThreshold($this->config['ranking_score_threshold'])
             ->withAttributesToHighlight(
-                array_unique([...$this->config['highlight_attributes'], ...$this->config['snippet_attributes']]),
+                array_unique([...$this->config['highlight_attributes'], ...array_keys($this->snippetAttributes())]),
                 $this->config['highlight_tags'][0],
                 $this->config['highlight_tags'][1]
+            )
+            ->withAttributesToCrop(
+                $this->snippetAttributes(),
+                $this->config['snippet_length'],
+                $this->config['snippet_marker'],
+                $this->config['snippet_max_fragments']
             );
 
         $result = $this->client()->search($parameters);
@@ -201,26 +209,22 @@ class Index extends BaseIndex
 
     protected function getSnippets(array $fields): array
     {
-        $attributes = $this->config['snippet_attributes'] ?? [];
-        if (empty($attributes)) {
-            return [];
-        }
+        return Arr::only($fields, array_keys($this->snippetAttributes()));
+    }
 
-        $this->snippetAttributes ??= collect($attributes)
+    /**
+     * Snippet attributes keyed by name, with their crop length in characters.
+     * Mirrors the shapes Loupe accepts: ['title'] and ['title' => 60].
+     *
+     * @return array<string, int>
+     */
+    protected function snippetAttributes(): array
+    {
+        return $this->snippetAttributes ??= collect($this->config['snippet_attributes'] ?? [])
             ->filter(fn ($value, $key) => is_string($key) || is_string($value))
-            ->mapWithKeys(fn ($value, $key) => is_string($key) ? [$key => $value] : [$value => 10])
-            ->all();
-
-        [$start, $end] = $this->config['highlight_tags'];
-
-        return collect($this->snippetAttributes)
-            ->map(function ($words, $attr) use ($fields, $start, $end) {
-                try {
-                    return (new Snippets($start, $end, $words))->generate($fields[$attr]);
-                } catch (Exception $e) {
-                    return Str::limit($fields[$attr], limit: 200, preserveWords: true);
-                }
-            })
+            ->mapWithKeys(fn ($value, $key) => is_string($key)
+                ? [$key => (int) $value]
+                : [$value => (int) $this->config['snippet_length']])
             ->all();
     }
 }

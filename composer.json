@@ -22,7 +22,7 @@
     },
     "require": {
         "php": "^8.3",
-        "loupe/loupe": "^0.13",
+        "loupe/loupe": "^1.0",
         "statamic/cms": "^6.0"
     },
     "require-dev": {

@@ -142,17 +142,14 @@ an empty array to let Loupe detect the language of every document by itself:
 
 ## Matching strategy
 
-The matching strategy decides how a query with multiple words is treated: whether a document has
-to contain every word (`all`) or whether any of them is enough (`any`).
-
-Loupe defaults to `any`. Documents matching more words rank higher, so a query like
-`winter tyre pressure` still puts documents containing all three words on top, followed by
+The matching strategy decides whether a document has to contain every word of a query (`all`) or
+whether any of them is enough (`any`). Loupe defaults to `any` and lets the ranking do the work:
+a query like `winter tyre pressure` puts documents containing all three words on top, followed by
 documents about winter tyres, followed by documents merely mentioning pressure. Nothing is
-discarded, the ranking does the work. If the long tail is too long, raise
-`ranking_score_threshold` to cut off weak matches instead of switching strategies.
+discarded, so `ranking_score_threshold` is the knob to cut off a long tail of weak matches.
 
-With `all`, every additional word narrows the result set. A query matching no document returns
-nothing, no matter how close it was.
+With `all`, every additional word narrows the result set instead, and a query matching no document
+returns nothing, no matter how close it was.
 
 ```diff
 'indexes' => [
@@ -164,18 +161,12 @@ nothing, no matter how close it was.
 ],
 ```
 
-Which one fits depends on what your users are doing when they type a second word:
+Which one fits depends on what your users do when they type a second word.
 
-- Use `any` when they are exploring and don't know the wording of your content. Site search,
-  documentation, editorial archives. Every extra word is a hint about relevance, not a
-  requirement, and a result they didn't ask for precisely is often the one they wanted.
-- Use `all` when they know what they are after and are narrowing down a list. Product
-  catalogues, ticket systems, large data tables. Here an extra word means "and also this",
-  and results that ignore it feel like noise.
-
-This is a decision per index, not per query. Ask yourself which end of the pipeline should do
-the heavy lifting: the ranking, which keeps everything and sorts it by relevance, or the user,
-who keeps typing until the list is short enough.
+- Use `any` when they are exploring and don't know the wording of your content, as in site search or
+documentation: every extra word is a hint about relevance, not a requirement.
+- Use `all` when they know what they are after and are narrowing down a list, as in product catalogues
+or ticket systems: an extra word means "and also this", and results ignoring it feel like noise.
 
 ## Stop words
 

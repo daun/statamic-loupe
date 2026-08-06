@@ -15,6 +15,20 @@ abstract class TestCase extends OrchestraTestCase
     use PreventSavingStacheItemsToDisk;
     use ResolvesStatamicConfig;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->preventSavingStacheItemsToDisk();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->deleteFakeStacheDirectory();
+
+        parent::tearDown();
+    }
+
     protected function getPackageProviders($app)
     {
         return [

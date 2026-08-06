@@ -2,6 +2,7 @@
 
 namespace Tests\Concerns;
 
+use Illuminate\Support\Str;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 
@@ -15,7 +16,7 @@ trait PreventSavingStacheItemsToDisk
 
         Stache::stores()->each(function ($store) {
             $dir = Path::tidy(fixtures_path());
-            $relative = str_after(str_after($store->directory(), $dir), '/');
+            $relative = Str::after(Str::after($store->directory(), $dir), '/');
             $store->directory($this->fakeStacheDirectory().'/'.$relative);
         });
     }
@@ -24,7 +25,7 @@ trait PreventSavingStacheItemsToDisk
     {
         app('files')->deleteDirectory($this->fakeStacheDirectory());
 
-        mkdir($this->fakeStacheDirectory());
+        mkdir($this->fakeStacheDirectory(), recursive: true);
         touch($this->fakeStacheDirectory().'/.gitkeep');
     }
 

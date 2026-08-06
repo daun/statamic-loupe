@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.0.0] - 2026-08-06
+
+- Upgrade loupe to 1.0
+- Add config options for stop words and ranking rules
+- Decompose compound words when searching German and English content
+- Limit language detection to configured sites for faster indexing
+- Use loupe's built-in cropping feature to generate search snippets
+- Breaking change: snippet context length is now measured in characters instead of words
+- Breaking change: all snippet attributes are now also highlighted
+
 ## [3.1.0] - 2026-03-24
 
 - Add support for Laravel 13
@@ -69,6 +79,7 @@
 
 - Initial release 🎉
 
+[4.0.0]: https://github.com/daun/statamic-loupe/releases/tag/4.0.0
 [3.1.0]: https://github.com/daun/statamic-loupe/releases/tag/3.1.0
 [3.0.0]: https://github.com/daun/statamic-loupe/releases/tag/3.0.0
 [2.0.0]: https://github.com/daun/statamic-loupe/releases/tag/2.0.0

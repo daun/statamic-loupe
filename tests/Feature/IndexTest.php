@@ -1,10 +1,12 @@
 <?php
 
+use Daun\StatamicLoupe\Loupe\Index;
 use Illuminate\Support\Facades\File;
 use Loupe\Loupe\Loupe;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Search;
+use Statamic\Search\Documents;
 
 beforeEach(function () {
     $this->basePath = fixtures_path('indexes', random_int(11, 99999999));
@@ -134,4 +136,33 @@ it('removes documents from the index', function () {
 
     $this->assertContains('Entry 1', $results);
     $this->assertNotContains('Entry 2', $results);
+});
+
+it('discards a stale index when the configuration changed', function () {
+    Collection::make()->handle('pages')->title('Pages')->save();
+
+    Entry::make()->id('test-1')->collection('pages')->data(['title' => 'Entry 1'])->save();
+
+    expect(collect(Search::index()->lookup('Entry'))->pluck('title'))->toContain('Entry 1');
+
+    /** @var Index */
+    $reconfigured = app()->makeWith(Index::class, ['name' => 'default', 'config' => [
+        ...config('statamic.search.indexes.default'),
+        'path' => config('statamic.search.drivers.loupe.path'),
+        'stop_words' => ['the'],
+    ]]);
+
+    expect($reconfigured->client()->needsReindex())->toBeTrue();
+
+    $reconfigured->insertDocuments(new Documents(['test-2' => ['title' => 'Entry 2']]));
+
+    // Documents indexed under the previous configuration are dropped
+    $results = collect($reconfigured->lookup('Entry'))->pluck('title');
+    expect($results)->toContain('Entry 2');
+    expect($results)->not->toContain('Entry 1');
+
+    // Following inserts keep appending again
+    $reconfigured->insertDocuments(new Documents(['test-3' => ['title' => 'Entry 3']]));
+
+    expect(collect($reconfigured->lookup('Entry'))->pluck('title'))->toContain('Entry 2', 'Entry 3');
 });

@@ -107,3 +107,34 @@ it('does not decompose compound words of another language', function () {
 
     expect(collect(Search::index()->lookup('Papier')))->toBeEmpty();
 });
+
+it('does not decompose compound words when another language is configured', function () {
+    useSites(['default' => ['url' => '/', 'locale' => 'de_DE']]);
+    config(['statamic.search.indexes.default.languages' => ['fr']]);
+
+    Collection::make()->handle('pages')->title('Pages')->save();
+    Entry::make()->id('test-1')->collection('pages')->data(['title' => 'Zeitungspapier'])->save();
+
+    expect(collect(Search::index()->lookup('Papier')))->toBeEmpty();
+});
+
+it('decomposes compound words when the language is added back', function () {
+    useSites(['default' => ['url' => '/', 'locale' => 'de_DE']]);
+    config(['statamic.search.indexes.default.languages' => ['fr', 'de']]);
+
+    Collection::make()->handle('pages')->title('Pages')->save();
+    Entry::make()->id('test-1')->collection('pages')->data(['title' => 'Zeitungspapier'])->save();
+
+    expect(collect(Search::index()->lookup('Papier'))->pluck('title'))->toContain('Zeitungspapier');
+});
+
+it('still decomposes compound words when opting out of language preselection', function () {
+    useSites(['default' => ['url' => '/', 'locale' => 'de_DE']]);
+    config(['statamic.search.indexes.default.languages' => []]);
+
+    Collection::make()->handle('pages')->title('Pages')->save();
+    Entry::make()->id('test-1')->collection('pages')->data(['title' => 'Zeitungspapier'])->save();
+
+    // Loupe detects the language per document instead of using the configured candidates
+    expect(collect(Search::index()->lookup('Papier'))->pluck('title'))->toContain('Zeitungspapier');
+});

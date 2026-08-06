@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add config option for the matching strategy of multi-word queries
+
 ## [4.0.0] - 2026-08-06
 
 - Upgrade loupe to 1.0

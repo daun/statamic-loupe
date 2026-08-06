@@ -9,15 +9,11 @@
 ...is a local SQLite search engine that is easy to set up and requires no additional infrastructure.
 
 - Only requires PHP and SQLite, nothing else
-- Tolerates typos and supports stemming
+- Tolerates typos, supports stemming and compound words
 - Supports `-negated` queries and `"phrase search"`
 - Supports filtering and ordering on geo distance
+- Highlights and crops relevant snippets
 - Sorts by relevance
-
-## This addon
-
-- Manages search indexes behind the scenes
-- Provides highlights and snippets for contextual search results
 
 ## Requirements
 
@@ -53,9 +49,12 @@ Now set your indexes to use the new driver.
 ## Configuration
 
 While Loupe will work just fine with the default settings, there are a few knobs
-you can turn to fine-tune the indexing and ranking of results.
-The values below are the default values. Most of these map directly to [Loupe's
-configuration items](https://github.com/loupe-php/loupe/blob/main/docs/configuration.md).
+you can turn to fine-tune the indexing and ranking of results. Most of these map
+directly to [Loupe's configuration items](https://github.com/loupe-php/loupe/blob/main/docs/configuration.md).
+
+The values below are the default values. It is recommended to only define the config
+keys you specifically care about. That way, the defaults keep applying when a future
+release of Loupe improves them.
 
 ```php
 'drivers' => [
@@ -63,31 +62,92 @@ configuration items](https://github.com/loupe-php/loupe/blob/main/docs/configura
         // Storage directory of Loupe's index database
         'path' => storage_path('statamic/loupe'),
 
-        // Maximum number of words allowed in a search
-        // Higher values allow more complex queries but may impact performance
-        'max_query_tokens' => 10,
+        // Relevance factors and their order of importance
+        'ranking_rules' => ['words', 'typo', 'proximity', 'attribute', 'exactness'],
 
-        // Minimum word length to allow searching by prefix
-        'min_token_length_for_prefix_search' => 2,
+        // Minimum ranking score of results to return (between `0.0` and `1.0`)
+        'ranking_score_threshold' => 0,
 
-        // Languages to consider for detecting stemming language
-        // Not required for stemming, but speeds things up if they are known
-        'stemming_languages' => [],
+        // Languages of the indexed content, see "Languages" section below
+        'languages' => 'auto',
+
+        // Words ignored when indexing and searching
+        'stop_words' => [],
 
         // Whether typo tolerance is enabled
         'typo_tolerance_enabled' => true,
 
-        // Size of the alphabet used for typo tolerance
-        'typo_tolerance_alphabet_size' => 4,
-
-        // Maximum length of terms to index for typo tolerance
-        'typo_tolerance_index_length' => 14,
-
         // Whether typo tolerance is enabled in prefix search
         'typo_tolerance_for_prefix_search' => false,
 
-        // Minimum ranking score of results to return (between `0.0` and `1.0`)
-        'ranking_score_threshold' => 0,
+        // Minimum word length to allow searching by prefix
+        'min_token_length_for_prefix_search' => 2,
+
+        // Maximum number of results returned per search
+        'hits_per_page' => null,
+
+        // Number of documents Loupe considers per matching term before ranking
+        // Lowering this speeds up searches, but may drop relevant results
+        'max_total_hits' => 1000,
+
+        // Maximum number of words allowed in a search
+        // Higher values allow more complex queries but may impact performance
+        'max_query_tokens' => 10,
+    ],
+],
+```
+
+## Languages
+
+Loupe uses the language of your content for stemming, normalizing and decomposing compound words.
+Decomposition is currently supported for German and English.
+
+By default, the languages are derived from your sites, so most setups need no configuration:
+
+| Setup | Derived languages |
+| --- | --- |
+| Single site | The site's language, e.g. `['de']` |
+| Multiple sites, one index per site | That site's language, e.g. `['de']` |
+| Multiple sites, one shared index | All site languages, e.g. `['de', 'en']` |
+
+Given a single language, Loupe skips language detection entirely, which is considerably faster.
+Given several, it narrows detection to those candidates. You can also configure the languages
+explicitly:
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'content',
++       'languages' => ['de'],
+    ],
+],
+```
+
+If your content is in a different language than your site, or a single site mixes languages, set
+an empty array to let Loupe detect the language of every document by itself:
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'content',
++       'languages' => [],
+    ],
+],
+```
+
+## Stop words
+
+Ignoring very common words of your content languages reduces the index size and keeps them from
+influencing relevance. Define them in the `stop_words` option.
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'content',
++       'stop_words' => ['the', 'a', 'an', 'of', 'and', 'or'],
     ],
 ],
 ```
@@ -116,7 +176,7 @@ You can now display the configured fields from the `search_highlights` namespace
 {{ /search:results }}
 ```
 
-You can also configure the exact tags to use for highlighting terms:
+You can configure the tags to use for highlighting terms. The default is plain `<mark>`.
 
 ```diff
 'indexes' => [
@@ -151,9 +211,6 @@ highlighted automatically, so there is no need to also list the attribute in
     ],
 ],
 ```
-    ],
-],
-```
 
 Then use the `search_snippets` namespace to display the formatted fields:
 
@@ -178,6 +235,7 @@ by `snippet_marker`:
     ],
 ],
 ```
+
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)

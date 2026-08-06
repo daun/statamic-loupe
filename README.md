@@ -83,6 +83,9 @@ release of Loupe improves them.
         // Minimum word length to allow searching by prefix
         'min_token_length_for_prefix_search' => 2,
 
+        // Strategy for multi-word queries, see "Matching strategy" section below
+        'matching_strategy' => 'any',
+
         // Maximum number of results returned per search
         'hits_per_page' => null,
 
@@ -136,6 +139,43 @@ an empty array to let Loupe detect the language of every document by itself:
     ],
 ],
 ```
+
+## Matching strategy
+
+The matching strategy decides how a query with multiple words is treated: whether a document has
+to contain every word (`all`) or whether any of them is enough (`any`).
+
+Loupe defaults to `any`. Documents matching more words rank higher, so a query like
+`winter tyre pressure` still puts documents containing all three words on top, followed by
+documents about winter tyres, followed by documents merely mentioning pressure. Nothing is
+discarded, the ranking does the work. If the long tail is too long, raise
+`ranking_score_threshold` to cut off weak matches instead of switching strategies.
+
+With `all`, every additional word narrows the result set. A query matching no document returns
+nothing, no matter how close it was.
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'content',
++       'matching_strategy' => 'all',
+    ],
+],
+```
+
+Which one fits depends on what your users are doing when they type a second word:
+
+- Use `any` when they are exploring and don't know the wording of your content. Site search,
+  documentation, editorial archives. Every extra word is a hint about relevance, not a
+  requirement, and a result they didn't ask for precisely is often the one they wanted.
+- Use `all` when they know what they are after and are narrowing down a list. Product
+  catalogues, ticket systems, large data tables. Here an extra word means "and also this",
+  and results that ignore it feel like noise.
+
+This is a decision per index, not per query. Ask yourself which end of the pipeline should do
+the heavy lifting: the ranking, which keeps everything and sorts it by relevance, or the user,
+who keeps typing until the list is short enough.
 
 ## Stop words
 

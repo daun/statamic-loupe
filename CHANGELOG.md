@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [4.1.0] - 2026-08-07
 
 - Add config option for the matching strategy of multi-word queries
 
@@ -83,6 +83,7 @@
 
 - Initial release 🎉
 
+[4.1.0]: https://github.com/daun/statamic-loupe/releases/tag/4.1.0
 [4.0.0]: https://github.com/daun/statamic-loupe/releases/tag/4.0.0
 [3.1.0]: https://github.com/daun/statamic-loupe/releases/tag/3.1.0
 [3.0.0]: https://github.com/daun/statamic-loupe/releases/tag/3.0.0

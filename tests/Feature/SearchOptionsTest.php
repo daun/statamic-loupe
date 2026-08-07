@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\File;
+use Loupe\Loupe\Exception\InvalidSearchParametersException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Search;
@@ -147,6 +148,32 @@ it('keeps low scoring results without a threshold', function () {
 
     expect(titlesFor('umbrella season'))->toHaveCount(2);
 });
+
+it('matches any query word by default', function () {
+    useIndexOptions([]);
+
+    indexEntry('a', ['title' => 'Umbrella Season']);
+    indexEntry('b', ['title' => 'Umbrella']);
+
+    expect(titlesFor('umbrella season'))->toContain('Umbrella Season', 'Umbrella');
+});
+
+it('requires all query words with the all matching strategy', function () {
+    useIndexOptions(['matching_strategy' => 'all']);
+
+    indexEntry('a', ['title' => 'Umbrella Season']);
+    indexEntry('b', ['title' => 'Umbrella']);
+
+    expect(titlesFor('umbrella season'))->toEqual(['Umbrella Season']);
+});
+
+it('rejects an unknown matching strategy', function () {
+    useIndexOptions(['matching_strategy' => 'some']);
+
+    indexEntry('a', ['title' => 'Umbrella']);
+
+    titlesFor('umbrella');
+})->throws(InvalidSearchParametersException::class);
 
 it('limits the number of query tokens', function () {
     useIndexOptions(['max_query_tokens' => 1]);

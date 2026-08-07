@@ -27,6 +27,7 @@ class Index extends BaseIndex
     protected array $defaults = [
         'fields' => ['title'],
         'languages' => 'auto',
+        'matching_strategy' => null,
         'max_query_tokens' => null,
         'max_total_hits' => null,
         'min_token_length_for_prefix_search' => 2,
@@ -93,6 +94,7 @@ class Index extends BaseIndex
     {
         $parameters = SearchParameters::create()
             ->withQuery($query)
+            ->withMatchingStrategy($this->matchingStrategy())
             ->withHitsPerPage($this->hitsPerPage())
             ->withShowRankingScore(true)
             ->withRankingScoreThreshold($this->config['ranking_score_threshold'])
@@ -170,6 +172,11 @@ class Index extends BaseIndex
         }
 
         return $tolerance;
+    }
+
+    public function matchingStrategy(): string
+    {
+        return $this->config['matching_strategy'] ?: SearchParameters::create()->getMatchingStrategy();
     }
 
     public function hitsPerPage(): int

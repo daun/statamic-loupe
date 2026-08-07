@@ -104,6 +104,22 @@ it('passes the configuration into the factory', function () {
 
 });
 
+it('defaults to the matching strategy of loupe', function () {
+    /** @var Index */
+    $index = $this->app->makeWith(Index::class, ['name' => 'default']);
+
+    expect($index->matchingStrategy())->toEqual(SearchParameters::create()->getMatchingStrategy());
+});
+
+it('uses a configured matching strategy', function () {
+    $config = ['matching_strategy' => 'all'];
+
+    /** @var Index */
+    $index = $this->app->makeWith(Index::class, ['name' => 'default', 'config' => $config]);
+
+    expect($index->matchingStrategy())->toEqual('all');
+});
+
 it('fetches as many results as loupe allows', function () {
     /** @var Index */
     $index = $this->app->makeWith(Index::class, ['name' => 'default']);

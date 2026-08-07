@@ -83,6 +83,9 @@ release of Loupe improves them.
         // Minimum word length to allow searching by prefix
         'min_token_length_for_prefix_search' => 2,
 
+        // Strategy for multi-word queries, see "Matching strategy" section below
+        'matching_strategy' => 'any',
+
         // Maximum number of results returned per search
         'hits_per_page' => null,
 
@@ -136,6 +139,34 @@ an empty array to let Loupe detect the language of every document by itself:
     ],
 ],
 ```
+
+## Matching strategy
+
+The matching strategy decides whether a document has to contain every word of a query (`all`) or
+whether any of them is enough (`any`). Loupe defaults to `any` and lets the ranking do the work:
+a query like `winter tyre pressure` puts documents containing all three words on top, followed by
+documents about winter tyres, followed by documents merely mentioning pressure. Nothing is
+discarded, so `ranking_score_threshold` is the knob to cut off a long tail of weak matches.
+
+With `all`, every additional word narrows the result set instead, and a query matching no document
+returns nothing, no matter how close it was.
+
+```diff
+'indexes' => [
+    'default' => [
+        'driver' => 'loupe',
+        'searchables' => 'content',
++       'matching_strategy' => 'all',
+    ],
+],
+```
+
+Which one fits depends on what your users do when they type a second word.
+
+- Use `any` when they are exploring and don't know the wording of your content, as in site search or
+documentation: every extra word is a hint about relevance, not a requirement.
+- Use `all` when they know what they are after and are narrowing down a list, as in product catalogues
+or ticket systems: an extra word means "and also this", and results ignoring it feel like noise.
 
 ## Stop words
 

@@ -2,11 +2,13 @@
 
 use Daun\StatamicLoupe\Loupe\Index;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Queue;
 use Loupe\Loupe\Loupe;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Search;
 use Statamic\Search\Documents;
+use Statamic\Search\InsertMultipleJob;
 
 beforeEach(function () {
     $this->basePath = fixtures_path('indexes', random_int(11, 99999999));
@@ -71,6 +73,55 @@ it('adds documents to the index', function () {
     $entry2->save();
 
     $this->assertCount(2, $index->lookup('Entry'));
+});
+
+it('keeps existing documents searchable while an update is queued', function () {
+    $index = Search::index();
+
+    Collection::make()->handle('pages')->title('Pages')->save();
+
+    Entry::make()
+        ->id('test-1')
+        ->collection('pages')
+        ->data(['title' => 'Entry 1'])
+        ->save();
+
+    expect($index->client()->countDocuments())->toBe(1);
+
+    Queue::fake();
+
+    $index->update();
+
+    Queue::assertPushed(InsertMultipleJob::class);
+    expect($index->client()->countDocuments())->toBe(1);
+});
+
+it('prunes stale documents across all browse result pages', function () {
+    $index = Search::index();
+    $documents = collect(range(1, 1001))->mapWithKeys(
+        fn (int $id) => ["stale::$id" => ['title' => "Stale $id"]]
+    );
+
+    $index->insertDocuments(new Documents($documents));
+
+    expect($index->client()->countDocuments())->toBe(1001);
+
+    Queue::fake();
+
+    $index->update();
+
+    expect($index->client()->countDocuments())->toBe(0);
+});
+
+it('deletes the index contents from its directory', function () {
+    $index = Search::index();
+    $index->client();
+
+    expect($index->exists())->toBeTrue();
+
+    (fn () => $this->deleteIndex())->call($index);
+
+    expect($index->exists())->toBeFalse();
 });
 
 it('updates documents in the index', function () {

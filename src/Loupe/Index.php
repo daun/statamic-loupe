@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Loupe\Loupe\BrowseParameters;
 use Loupe\Loupe\Config\TypoTolerance;
 use Loupe\Loupe\Configuration;
 use Loupe\Loupe\Loupe;
@@ -231,16 +232,55 @@ class Index extends BaseIndex
 
     public function update()
     {
-        $this->truncateIndex();
+        $pruneCandidates = $this->indexedDocumentIds();
 
-        $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
+        $this->searchables()->lazy()->each(function ($searchables) use (&$pruneCandidates) {
+            $references = $searchables->map(function ($reference) use (&$pruneCandidates) {
+                unset($pruneCandidates[$reference]);
+
+                return $reference;
+            });
+
+            $this->insertMultiple($references);
+        });
+
+        if ($pruneCandidates !== []) {
+            $this->client()->deleteDocuments(array_keys($pruneCandidates));
+        }
 
         return $this;
     }
 
+    /**
+     * @return array<string, true>
+     */
+    protected function indexedDocumentIds(): array
+    {
+        $ids = [];
+        $page = 1;
+
+        do {
+            $result = $this->client()->browse(
+                BrowseParameters::create()
+                    ->withAttributesToRetrieve(['id'])
+                    ->withHitsPerPage(BrowseParameters::MAX_LIMIT)
+                    ->withPage($page)
+            );
+
+            foreach ($result->getHits() as $hit) {
+                $ids[$hit['id']] = true;
+            }
+
+            $page++;
+        } while ($page <= $result->getTotalPages());
+
+        return $ids;
+    }
+
     protected function deleteIndex()
     {
-        $this->filesystem->cleanDirectory($this->path());
+        $this->client = null;
+        $this->filesystem->cleanDirectory($this->dir());
     }
 
     protected function createIndex()

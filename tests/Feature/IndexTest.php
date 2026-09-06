@@ -1,8 +1,12 @@
 <?php
 
+use Daun\StatamicLoupe\Loupe\Factory;
 use Daun\StatamicLoupe\Loupe\Index;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\LazyCollection;
+use Loupe\Loupe\BrowseParameters;
 use Loupe\Loupe\Loupe;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -94,6 +98,48 @@ it('keeps existing documents searchable while an update is queued', function () 
 
     Queue::assertPushed(InsertMultipleJob::class);
     expect($index->client()->countDocuments())->toBe(1);
+});
+
+it('does not prune documents inserted while an update is running', function () {
+    $index = new class(app(Factory::class), app(Filesystem::class), 'concurrent', ['path' => $this->basePath, 'searchables' => [], 'fields' => ['title']]) extends Index
+    {
+        public LazyCollection $references;
+
+        public function searchables()
+        {
+            return new class($this->references)
+            {
+                public function __construct(private LazyCollection $references) {}
+
+                public function lazy(): LazyCollection
+                {
+                    return collect([$this->references])->lazy();
+                }
+            };
+        }
+    };
+
+    $index->insertDocuments(new Documents([
+        'stale::1' => ['title' => 'Stale'],
+    ]));
+
+    $index->references = LazyCollection::make(function () use ($index) {
+        $index->insertDocuments(new Documents([
+            'entry::concurrent' => ['title' => 'Concurrent'],
+        ]));
+
+        yield 'entry::current';
+    });
+
+    Queue::fake();
+
+    $index->update();
+
+    $ids = $index->client()->browse(
+        BrowseParameters::create()->withAttributesToRetrieve(['id'])
+    )->getHits();
+
+    expect(collect($ids)->pluck('id')->all())->toBe(['entry::concurrent']);
 });
 
 it('prunes stale documents across all browse result pages', function () {

@@ -232,11 +232,11 @@ class Index extends BaseIndex
 
     public function update()
     {
-        $seen = [];
+        $pruneCandidates = $this->indexedDocumentIds();
 
-        $this->searchables()->lazy()->each(function ($searchables) use (&$seen) {
-            $references = $searchables->map(function ($reference) use (&$seen) {
-                $seen[$reference] = true;
+        $this->searchables()->lazy()->each(function ($searchables) use (&$pruneCandidates) {
+            $references = $searchables->map(function ($reference) use (&$pruneCandidates) {
+                unset($pruneCandidates[$reference]);
 
                 return $reference;
             });
@@ -244,17 +244,19 @@ class Index extends BaseIndex
             $this->insertMultiple($references);
         });
 
-        $this->prune($seen);
+        if ($pruneCandidates !== []) {
+            $this->client()->deleteDocuments(array_keys($pruneCandidates));
+        }
 
         return $this;
     }
 
     /**
-     * @param  array<string, true>  $seen
+     * @return array<string, true>
      */
-    protected function prune(array $seen): void
+    protected function indexedDocumentIds(): array
     {
-        $stale = [];
+        $ids = [];
         $page = 1;
 
         do {
@@ -266,17 +268,13 @@ class Index extends BaseIndex
             );
 
             foreach ($result->getHits() as $hit) {
-                if (! isset($seen[$hit['id']])) {
-                    $stale[] = $hit['id'];
-                }
+                $ids[$hit['id']] = true;
             }
 
             $page++;
         } while ($page <= $result->getTotalPages());
 
-        if ($stale !== []) {
-            $this->client()->deleteDocuments($stale);
-        }
+        return $ids;
     }
 
     protected function deleteIndex()

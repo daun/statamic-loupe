@@ -113,10 +113,12 @@ class Index extends BaseIndex
 
         $result = $this->client()->search($parameters);
 
+        $primaryKey = $this->configuration()->getPrimaryKey();
+
         return collect($result->getHits())
             ->map(fn ($hit) => [
                 ...$hit,
-                'reference' => $hit['id'],
+                'reference' => $hit[$primaryKey],
                 'search_score' => floor($hit['_rankingScore'] * 100),
             ]);
     }
@@ -127,10 +129,12 @@ class Index extends BaseIndex
             return $this->configuration;
         }
 
+        $primaryKey = 'id';
+
         $configuration = Configuration::create()
-            ->withPrimaryKey('id')
+            ->withPrimaryKey($primaryKey)
             ->withSearchableAttributes(
-                collect($this->config['fields'])->keyBy(fn ($f) => $f)->except(['id'])->values()->all()
+                collect($this->config['fields'])->keyBy(fn ($f) => $f)->except([$primaryKey])->values()->all()
             )
             ->withLanguages($this->languages())
             ->withTypoTolerance($this->typoTolerance());
@@ -223,8 +227,10 @@ class Index extends BaseIndex
             $this->truncateIndex();
         }
 
+        $primaryKey = $this->configuration()->getPrimaryKey();
+
         $documentsWithIds = $documents
-            ->map(fn (array $doc, string $reference) => [...$doc, 'id' => $reference])
+            ->map(fn (array $doc, string $reference) => [...$doc, $primaryKey => $reference])
             ->values();
 
         $this->client()->addDocuments($documentsWithIds->all());
@@ -256,19 +262,20 @@ class Index extends BaseIndex
      */
     protected function indexedDocumentIds(): array
     {
+        $primaryKey = $this->configuration()->getPrimaryKey();
         $ids = [];
         $page = 1;
 
         do {
             $result = $this->client()->browse(
                 BrowseParameters::create()
-                    ->withAttributesToRetrieve(['id'])
+                    ->withAttributesToRetrieve([$primaryKey])
                     ->withHitsPerPage(BrowseParameters::MAX_LIMIT)
                     ->withPage($page)
             );
 
             foreach ($result->getHits() as $hit) {
-                $ids[$hit['id']] = true;
+                $ids[$hit[$primaryKey]] = true;
             }
 
             $page++;

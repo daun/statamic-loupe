@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.2.0] - 2026-09-06
+
+- Keep index searchable while it's being updated
+- Use the configured primary key consistently
+
 ## [4.1.0] - 2026-08-07
 
 - Add config option for the matching strategy of multi-word queries
